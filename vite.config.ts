@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
     return {
-      base: '/New-Folder--4-/', // Podešeno za tvoj repozitorijum Indodjija1
+      base: '/New-folder--4-/', // Podešeno za tvoj repozitorijum Indodjija1
       server: {
         port: 3000,
         host: '0.0.0.0',
