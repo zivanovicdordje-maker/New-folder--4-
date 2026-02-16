@@ -43,7 +43,7 @@ const SERVICE_IMAGES: Record<string, string> = {
 
 const GALLERY_IMAGES = [
   getImgPath("slike/galerija/zurka1.jpg"),
-  getImgPath("slike/galerija/rodjenje1.jpg"),
+  getImgPath("slike/galerija/rodjenje.jpg"),
   getImgPath("slike/galerija/prosotr1.jpg"),
   getImgPath("slike/galerija/pozadina.jpg"),
   getImgPath("slike/galerija/zurka.jpg"),
