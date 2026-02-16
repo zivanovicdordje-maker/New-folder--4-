@@ -1,13 +1,19 @@
-
 <!DOCTYPE html>
 <html lang="sr" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>INDOĐIJA LUXURY – Event Garden</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts - Zadržani tvoji fontovi -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <!-- PayPal SDK - Zadržan tvoj ID -->
     <script src="https://www.paypal.com/sdk/js?client-id=BAAduCqSQY22LnkY_KBfvUgj4b_Wq9R04GgDwAyMONOR3SdjjpJCVHMenPXanLtgIdPFKTrBmxFVKpuc4Y&components=hosted-buttons&disable-funding=venmo&currency=EUR"></script>
+    
     <style>
         :root {
             --dark-green: #1f2e2a;
@@ -47,24 +53,17 @@
         .gallery-scroll::-webkit-scrollbar { height: 4px; }
         .gallery-scroll::-webkit-scrollbar-thumb { background: var(--gold); }
     </style>
-<script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@^19.2.4",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
-    "react/": "https://esm.sh/react@^19.2.4/",
-    "path": "https://esm.sh/path@^0.12.7",
-    "url": "https://esm.sh/url@^0.11.4",
-    "vite": "https://esm.sh/vite@^7.3.1",
-    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.4"
-  }
-}
-</script>
-<link rel="stylesheet" href="/index.css">
+
+    <!-- UKLONJEN IMPORTMAP: On pravi konflikt sa Vite-om na GitHub-u -->
+    <!-- UKLONJEN LINK ZA CSS: Vite će sam ubaciti CSS iz tvog index.tsx fajla -->
 </head>
 <body class="h-full">
     <div id="root"></div>
-    <script type="module" src="./index.tsx"></script>
-<script type="module" src="/index.tsx"></script>
+
+    <!-- REŠENJE ZA SCRIPT GRESKE: -->
+    <!-- Na GitHub Pages, putanja mora biti relativna da bi Vite mogao da je "uhvati" -->
+    <!-- Ako ti je index.tsx u folderu 'src', koristi: src="/src/index.tsx" -->
+    <!-- Ako ti je index.tsx u istom folderu gde i ovaj html, koristi: src="/index.tsx" -->
+    <script type="module" src="/index.tsx"></script>
 </body>
 </html>
