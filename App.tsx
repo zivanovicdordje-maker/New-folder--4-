@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Reservation, PackageKey, ExtraServices, Comment } from './types';
 import { dataService } from './services/dataService';
@@ -14,40 +13,48 @@ declare global {
   }
 }
 
+// POMOĆNA FUNKCIJA ZA SLIKE - Rešava problem sa GitHub putanjama
+const getImgPath = (path: string) => {
+  const base = import.meta.env.BASE_URL || '/';
+  // Uklanja ./ sa početka ako postoji i spaja sa bazom
+  const cleanPath = path.replace(/^\.\//, '');
+  return `${base}${cleanPath}`;
+};
+
 const PKG_IMAGES: Record<PackageKey, string> = {
-  kids: "./slike/paketi/deca.jpg",
-  teen: "./slike/paketi/zurka6.jpg",
-  adult: "./slike/paketi/rodjenje.jpg",
-  baby: "./slike/paketi/rodjenje1.jpg",
-  gender: "./slike/paketi/gender.jpg",
-  eighteen: "./slike/paketi/zurka5.jpg",
-  slavlja: "./slike/paketi/slavlja.jpg"
+  kids: getImgPath("slike/paketi/deca.jpg"),
+  teen: getImgPath("slike/paketi/zurka6.jpg"),
+  adult: getImgPath("slike/paketi/rodjenje.jpg"),
+  baby: getImgPath("slike/paketi/rodjenje1.jpg"),
+  gender: getImgPath("slike/paketi/gender.jpg"),
+  eighteen: getImgPath("slike/paketi/zurka5.jpg"),
+  slavlja: getImgPath("slike/paketi/slavlja.jpg")
 };
 
 const SERVICE_IMAGES: Record<string, string> = {
-  photographer: "./slike/galerija/foto.jpg",
-  decoration: "./slike/galerija/dekoracija.jpg",
-  catering: "./slike/galerija/ketering.jpg",
-  makeup: "./slike/galerija/sminka.jpg",
-  dj: "./slike/galerija/dj.jpg",
-  waiter: "./slike/galerija/konobar.jpg",
-  tables: "./slike/galerija/stolovi.jpg"
+  photographer: getImgPath("slike/galerija/foto.jpg"),
+  decoration: getImgPath("slike/galerija/dekoracija.jpg"),
+  catering: getImgPath("slike/galerija/ketering.jpg"),
+  makeup: getImgPath("slike/galerija/sminka.jpg"),
+  dj: getImgPath("slike/galerija/dj.jpg"),
+  waiter: getImgPath("slike/galerija/konobar.jpg"),
+  tables: getImgPath("slike/galerija/stolovi.jpg")
 };
 
 const GALLERY_IMAGES = [
-  "./slike/galerija/zurka1.jpg",
-  "./slike/galerija/rodjenje1.jpg",
-  "./slike/galerija/prosotr1.jpg",
-  "./slike/galerija/pozadina.jpg",
-  "./slike/galerija/zurka.jpg",
-  "./slike/galerija/zurka6.jpg"
+  getImgPath("slike/galerija/zurka1.jpg"),
+  getImgPath("slike/galerija/rodjenje1.jpg"),
+  getImgPath("slike/galerija/prosotr1.jpg"),
+  getImgPath("slike/galerija/pozadina.jpg"),
+  getImgPath("slike/galerija/zurka.jpg"),
+  getImgPath("slike/galerija/zurka6.jpg")
 ];
 
 const HOLIDAYS = [
-  { name: 'Nova Godina', img: './slike/galerija/vatromet.jpg', icon: '🎄' },
-  { name: 'Repriza Nove Godine', img: './slike/galerija/sampanjac.jpg', icon: '🎆' },
-  { name: 'Srpska Nova Godina', img: './slike/galerija/prskalica.jpg', icon: '🇷🇸' },
-  { name: '1. Maj', img: './slike/galerija/1maj.jpg', icon: '🌱' }
+  { name: 'Nova Godina', img: getImgPath('slike/galerija/vatromet.jpg'), icon: '🎄' },
+  { name: 'Repriza Nove Godine', img: getImgPath('slike/galerija/sampanjac.jpg'), icon: '🎆' },
+  { name: 'Srpska Nova Godina', img: getImgPath('slike/galerija/prskalica.jpg'), icon: '🇷🇸' },
+  { name: '1. Maj', img: getImgPath('slike/galerija/1maj.jpg'), icon: '🌱' }
 ];
 
 const CANVA_PRESENTATION_URL = "https://www.canva.com/design/DAGty2-d1Ik/kEB1xHTzGHi0krgT0lC6tg/view?utm_content=DAGty2-d1Ik&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=ha42092f073";
@@ -337,7 +344,7 @@ const App: React.FC = () => {
                  <h2 className="font-display text-5xl md:text-8xl">Indođija</h2>
                  <p className="text-[var(--gold)] italic text-xl md:text-2xl tracking-widest font-display">Vaša Oaza Luksuza</p>
               </div>
-              <img src="./slike/galerija/prosotr1.jpg" className="w-full h-[300px] md:h-[500px] object-cover rounded-[40px] md:rounded-[60px] shadow-2xl" alt="Indođija Prozor" />
+              <img src={getImgPath("slike/galerija/prosotr1.jpg")} className="w-full h-[300px] md:h-[500px] object-cover rounded-[40px] md:rounded-[60px] shadow-2xl" alt="Indođija Prozor" />
               
               <div className="grid md:grid-cols-2 gap-10 md:gap-16 text-base md:text-lg leading-relaxed text-white/80 font-light">
                  <p>Smeštena u samom srcu vojvođanske ravnice, Indođija Luxury Event Garden predstavlja krunu inđijske ponude za proslave. Naša misija je jednostavna: stvoriti prostor u kojem se priroda i moderni luksuz prepliću, stvarajući atmosferu koja oduzima dah.</p>
@@ -351,7 +358,7 @@ const App: React.FC = () => {
                     <p className="text-white/60 text-sm md:text-base max-w-xl mx-auto">Pogledajte našu kompletnu digitalnu prezentaciju sa svim detaljima, paketima i dodatnim opcijama.</p>
                  </div>
                  <div className="relative group max-w-2xl mx-auto overflow-hidden rounded-3xl aspect-video bg-black/20 flex items-center justify-center border border-white/5">
-                    <img src="./slike/galerija/pozadina.jpg" className="absolute inset-0 w-full h-full object-cover opacity-30 blur-sm group-hover:scale-110 transition-transform duration-700" alt="Preview" />
+                    <img src={getImgPath("slike/galerija/pozadina.jpg")} className="absolute inset-0 w-full h-full object-cover opacity-30 blur-sm group-hover:scale-110 transition-transform duration-700" alt="Preview" />
                     <div className="relative z-10 flex flex-col items-center gap-6">
                        <div className="w-20 h-20 bg-[var(--gold)] rounded-full flex items-center justify-center shadow-2xl animate-pulse">
                           <svg width="40" height="40" fill="currentColor" viewBox="0 0 24 24" className="text-[var(--dark-green)]"><path d="M8 5v14l11-7z"/></svg>
@@ -424,7 +431,7 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3 cursor-pointer group" onClick={() => scrollTo('hero')}>
             <div className="w-10 h-10 border border-[var(--gold)] rounded-full overflow-hidden transition-all group-hover:scale-110 bg-[var(--dark-green)]">
-               <img src="./slike/galerija/logo.jpg" alt="Indođija Logo" className="w-full h-full object-cover" />
+               <img src={getImgPath("slike/galerija/logo.jpg")} alt="Indođija Logo" className="w-full h-full object-cover" />
             </div>
             <span className="font-display text-white text-lg md:text-xl tracking-[2px] font-bold">INDOĐIJA</span>
           </div>
@@ -469,7 +476,10 @@ const App: React.FC = () => {
       )}
 
       <section id="hero" className="relative h-screen flex items-center justify-center bg-[var(--dark-green)]">
-        <div className="absolute inset-0 opacity-40 bg-[url('./images/hero-bg.jpg')] bg-cover bg-center grayscale scale-105"></div>
+        <div 
+          className="absolute inset-0 opacity-40 bg-cover bg-center grayscale scale-105"
+          style={{ backgroundImage: `url(${getImgPath('slike/galerija/pozadina.jpg')})` }}
+        ></div>
         <div className="relative z-10 text-center px-6">
            <h1 className="font-display text-6xl md:text-9xl text-white mb-6 drop-shadow-2xl animate-fade-up uppercase tracking-tighter text-shadow-xl">INDOĐIJA</h1>
            <p className="font-display italic text-xl md:text-3xl text-[var(--gold)] mb-12 animate-fade-up delay-100">Gde luksuz susreće prirodu.</p>
@@ -517,14 +527,14 @@ const App: React.FC = () => {
                        <p className="text-gray-500 text-xs md:text-sm leading-relaxed font-medium">Od sada u Indođiji rezervisati <strong>vožnju kvadom</strong>! Priuštite mališanima nezaboravnu avanturu u bezbednom okruženju uz stručan nadzor.</p>
                     </div>
                     <div className="w-full md:w-[200px] lg:w-[240px] aspect-square rounded-[30px] md:rounded-[40px] overflow-hidden shadow-2xl transition-transform hover:scale-105 duration-500 border-4 border-white">
-                       <img src="./slike/galerija/kvad.jpg" alt="Deciji Kvad" className="w-full h-full object-cover" />
+                       <img src={getImgPath("slike/galerija/kvad.jpg")} alt="Deciji Kvad" className="w-full h-full object-cover" />
                     </div>
                  </div>
               </div>
            </div>
            <div className="flex-1 relative w-full">
               <div className="w-full h-[400px] md:h-[650px] rounded-[60px] md:rounded-[120px] overflow-hidden shadow-2xl z-10 lg:rotate-[2deg] border-[8px] md:border-[12px] border-white">
-                 <img src="./slike/galerija/slavlja.jpg" className="w-full h-full object-cover" alt="Garden" />
+                 <img src={getImgPath("slike/galerija/slavlja.jpg")} className="w-full h-full object-cover" alt="Garden" />
               </div>
               <div className="absolute -bottom-8 -left-8 md:-bottom-16 md:-left-16 w-40 md:w-80 h-40 md:h-80 bg-[var(--gold)]/30 rounded-full blur-[60px] md:blur-[120px] z-0"></div>
            </div>
@@ -821,7 +831,7 @@ const App: React.FC = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-24 mb-24 md:mb-32 text-center md:text-left">
             <div className="space-y-8 md:space-y-10 flex flex-col items-center md:items-start">
                <div className="w-20 h-20 md:w-24 md:h-24 border border-white/10 rounded-full overflow-hidden grayscale hover:grayscale-0 transition-all duration-700 mb-4 md:mb-6 bg-[var(--dark-green)] flex items-center justify-center">
-                 <img src="./slike/galerija/logo.jpg" alt="Indođija Logo" className="w-full h-full object-cover" />
+                 <img src={getImgPath("slike/galerija/logo.jpg")} alt="Indođija Logo" className="w-full h-full object-cover" />
                </div>
                <p className="text-white/30 text-[9px] md:text-[11px] leading-loose uppercase tracking-[2px] md:tracking-[3px]">Inđijski premium event vrt. Vaše uspomene zaslužuju luksuz koji pruža Indođija.</p>
             </div>
