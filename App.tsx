@@ -104,16 +104,19 @@ const App: React.FC = () => {
 
 const refreshData = async () => {
     try {
+      console.log("Osvežavam podatke iz baze...");
       const resData = await dataService.getReservations();
       const commData = await dataService.getComments();
       
-      // Osiguravamo da su podaci nizovi pre nego što ih sačuvamo
-      setReservations(Array.isArray(resData) ? resData : []);
-      setComments(Array.isArray(commData) ? commData : []);
+      if (resData) {
+        setReservations(resData);
+        console.log("Stiglo rezervacija:", resData.length);
+      }
+      if (commData) setComments(commData);
     } catch (err) {
       console.error("Greška pri osvežavanju podataka:", err);
     }
-  };
+};
 
 useEffect(() => {
     refreshData(); // Poziva se jednom kad se sajt učita
@@ -201,7 +204,7 @@ useEffect(() => {
   const getAvailableSlots = () => {
     if (!selectedDate) return [];
     const pkg = PACKAGES[activePackage];
-    const dayReservations = reservations.filter(r => r.date === selectedDate && r.status === 'confirmed');
+   const dayReservations = reservations.filter(r => (r.date?.split('T')[0] === selectedDate) && r.status === 'confirmed');
     
     let possibleSlots = pkg.slots;
     if (activePackage === 'teen' && teenDuration) {
@@ -228,7 +231,11 @@ useEffect(() => {
       const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
       const isPast = new Date(calYear, calMonth, d) < today;
       const isHoliday = isHolidayDate(dateStr);
-      const dayReservations = reservations.filter(r => r.date === dateStr && r.status === 'confirmed');
+     const dayReservations = reservations.filter(r => {
+  // Ovo osigurava da poredimo samo YYYY-MM-DD deo, čak i ako baza vrati drugačije
+  const rDate = r.date ? r.date.split('T')[0] : '';
+  return rDate === dateStr && (r.status === 'confirmed' || r.status === 'booked');
+});
       
       const totalPossibleSlots = ALL_DAY_SLOTS.length;
       const bookedCount = dayReservations.length;
