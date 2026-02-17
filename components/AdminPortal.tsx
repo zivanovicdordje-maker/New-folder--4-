@@ -10,7 +10,6 @@ interface AdminPortalProps {
 const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
-  // Inicijalizujemo kao prazan niz da ne bi puklo pre učitavanja
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const [error, setError] = useState('');
@@ -33,11 +32,8 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
   const TEEN_SLOTS_3H = ['20:00–23:00', '21:00–00:00', '22:00–01:00'];
   const TEEN_SLOTS_4H = ['20:00–00:00', '21:00–01:00', '22:00–02:00'];
 
-  // --- SIGURNOSNA LOGIKA ---
-  // Ovo garantuje da nikada ne pukne "filter is not a function"
   const safeReservations = Array.isArray(reservations) ? reservations : [];
   const safeComments = Array.isArray(comments) ? comments : [];
-  // -------------------------
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -49,7 +45,6 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
   const loadReservations = async () => {
     try {
       const data = await dataService.getReservations();
-      // Ako dataService vrati null ili undefined, stavljamo prazan niz
       setReservations(Array.isArray(data) ? data : []);
     } catch (e) {
       console.error("Greška pri učitavanju rezervacija:", e);
@@ -78,7 +73,6 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
   };
 
   const handleDelete = async (id: string | number) => {
-    // eslint-disable-next-line no-restricted-globals
     if (confirm('Da li ste sigurni da želite da obrišete ovu rezervaciju?')) {
       await dataService.deleteReservation(id); 
       await loadReservations();
@@ -86,7 +80,6 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
   };
 
   const handleDeleteComment = async (id: string | number) => {
-    // eslint-disable-next-line no-restricted-globals
     if (confirm('Obrisati ovaj komentar?')) {
       await dataService.deleteComment(id);
       await loadComments();
@@ -104,77 +97,63 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
   const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newComment.author && newComment.text) {
-      await dataService.saveComment(newComment);
-      await loadComments();
-      setShowCommentModal(false);
-      setNewComment({ author: '', text: '', rating: 5 });
+      try {
+        await dataService.saveComment(newComment);
+        await loadComments();
+        setShowCommentModal(false);
+        setNewComment({ author: '', text: '', rating: 5 });
+      } catch (err) {
+        console.error("Greška kod komentara:", err);
+        alert("Neuspešno dodavanje utiska.");
+      }
     }
   };
 
-const handleSaveReservation = async (e: React.FormEvent) => {
+  // POPRAVLJENA FUNKCIJA - SADA JE ASYNC I NEMA DUPLI KOD
+  const handleSaveReservation = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Pripremi podatke pažljivo
-    const reservationData = {
-      customer_name: editingRes?.customer_name,
-      customer_phone: editingRes?.customer_phone,
-      customer_email: editingRes?.customer_email || '',
-      date: editingRes?.date,
-      time_slot: editingRes?.time_slot,
-      package_type: editingRes?.package_type,
-      total_price: Number(editingRes?.total_price) || 0, // Osiguraj da je broj
-      guest_count: Number(editingRes?.guest_count) || 0, // Osiguraj da je broj
-      notes: editingRes?.notes || '',
-      status: 'confirmed',
-      deposit_paid: true,
-      space: editingRes?.space || 'open',
-      extras: editingRes?.extras || {} // Mora biti JSON u bazi
-    };
-
-    try {
-      // Pozovi servis
-      const result = await dataService.saveReservation(reservationData as any);
-      
-      // Ako tvoj dataService vraća grešku unutar objekta, proveri je
-      if (result && (result as any).error) {
-          throw (result as any).error;
-      }
-
-      alert('Uspešno sačuvano!');
-      await loadReservations();
-      setShowFormModal(false);
-    } catch (err: any) {
-      console.error("DETALJNA GREŠKA IZ SUPABASE-A:", err);
-      // Ovde će ti u konzoli sada pisati npr: "column status does not exist"
-      alert('Greška: ' + (err.message || 'Proverite konzolu za detalje'));
-    }
-};
-
-    const isOccupied = safeReservations.some(r => 
-      r.date === editingRes.date && 
-      r.time_slot === editingRes.time_slot && 
-      r.id !== editingRes.id
-    );
-
-    if (isOccupied) {
-      alert('Ovaj termin je VEĆ ZAUZET! Molimo izaberite drugi termin ili datum.');
+    if (!editingRes?.customer_name || !editingRes?.date || !editingRes?.time_slot) {
+      alert('Molimo popunite osnovna polja!');
       return;
     }
-    
-    await dataService.saveReservation({
-      ...editingRes,
-      notes: editingRes.notes || '',
-      created_at: editingRes.created_at || new Date().toISOString(),
-      status: editingRes.status || 'confirmed',
-      guest_count: editingRes.guest_count || 30,
-      total_price: editingRes.total_price || 0,
-      deposit_paid: true,
-      extras: editingRes.extras || { tables: 0, waiterHours: 0, ledKg: 0, photographer: false, decoration: false, catering: false, makeup: false, dj: false }
-    } as Omit<Reservation, 'id'>);
-    
-    await loadReservations(); 
-    setShowFormModal(false);
-    setEditingRes(null);
+
+    try {
+      const isOccupied = safeReservations.some(r => 
+        r.date === editingRes.date && 
+        r.time_slot === editingRes.time_slot && 
+        r.id !== editingRes.id
+      );
+
+      if (isOccupied) {
+        alert('Ovaj termin je VEĆ ZAUZET! Molimo izaberite drugi termin ili datum.');
+        return;
+      }
+      
+      await dataService.saveReservation({
+        customer_name: editingRes.customer_name,
+        customer_phone: editingRes.customer_phone,
+        customer_email: editingRes.customer_email || '',
+        date: editingRes.date,
+        time_slot: editingRes.time_slot,
+        package_type: editingRes.package_type,
+        space: editingRes.space || 'open',
+        guest_count: Number(editingRes.guest_count) || 30,
+        total_price: Number(editingRes.total_price) || 0,
+        notes: editingRes.notes || '',
+        status: editingRes.status || 'confirmed',
+        created_at: editingRes.created_at || new Date().toISOString(),
+        deposit_paid: true,
+        extras: editingRes.extras || { tables: 0, waiterHours: 0, ledKg: 0, photographer: false, decoration: false, catering: false, makeup: false, dj: false }
+      } as any);
+      
+      alert('Uspešno sačuvano!');
+      await loadReservations(); 
+      setShowFormModal(false);
+      setEditingRes(null);
+    } catch (err: any) {
+      console.error("GREŠKA PRI ČUVANJU:", err);
+      alert("Greška: " + (err.message || "Proverite bazu podataka"));
+    }
   };
 
   const filteredReservations = useMemo(() => {
@@ -209,8 +188,6 @@ const handleSaveReservation = async (e: React.FormEvent) => {
     for (let i = 0; i < startDay; i++) cells.push(<div key={`empty-${i}`}></div>);
     for (let d = 1; d <= lastDay.getDate(); d++) {
       const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      
-      // OVDE JE BILA GREŠKA - sada koristimo safeReservations
       const dayReservations = safeReservations.filter(r => r.date === dateStr);
       const bookedCount = dayReservations.length;
       
@@ -291,7 +268,6 @@ const handleSaveReservation = async (e: React.FormEvent) => {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-4">
              <div className="w-10 h-10 rounded-full overflow-hidden bg-white/10 p-1">
-                {/* Koristimo sigurnu putanju za sliku ili placeholder */}
                 <div className="w-full h-full bg-[#c8a45d] rounded-full flex items-center justify-center font-bold text-[#1f2e2a]">I</div>
              </div>
              <h1 className="font-display text-2xl font-bold tracking-widest uppercase">Indođija <span className="text-[#c8a45d]">Admin</span></h1>
@@ -425,7 +401,6 @@ const handleSaveReservation = async (e: React.FormEvent) => {
         )}
       </main>
 
-      {/* MODALI (ostaju isti, ali sa sigurnim pozivima) */}
       {showCommentModal && (
         <div className="fixed inset-0 z-[3000] bg-[#1f2e2a]/80 backdrop-blur-sm flex items-center justify-center p-6">
           <div className="bg-white w-full max-w-lg p-10 rounded-[40px] shadow-2xl animate-fade-up text-[#1f2e2a]">
