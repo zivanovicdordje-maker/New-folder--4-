@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { dataService } from '../services/dataService'; // Proveri putanju (./ ili ../)
-import { Reservation, PackageKey, Comment } from '../types';
-import { PACKAGES, ALL_DAY_SLOTS } from '../constants';
+// ISPRAVLJENE PUTANJE ZA TVOJU STRUKTURU GDE SU FAJLOVI U ROOT-U
+import { dataService } from './services/dataService'; 
+import { Reservation, PackageKey, Comment } from './types';
+import { PACKAGES, ALL_DAY_SLOTS } from './constants';
 
 interface AdminPortalProps {
   onClose: () => void;
@@ -39,15 +40,23 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
     }
   }, [isAuthenticated]);
 
-  // IZMENA: Funkcije za učitavanje su sada async (za Supabase)
+  // IZMENA: Funkcije su sada ASYNC da bi sačekale bazu (Supabase)
   const loadReservations = async () => {
-    const data = await dataService.getReservations();
-    setReservations(data);
+    try {
+      const data = await dataService.getReservations();
+      setReservations(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Greška pri učitavanju rezervacija:", err);
+    }
   };
 
   const loadComments = async () => {
-    const data = await dataService.getComments();
-    setComments(data);
+    try {
+      const data = await dataService.getComments();
+      setComments(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Greška pri učitavanju komentara:", err);
+    }
   };
 
   const handleLogin = (e: React.FormEvent) => {
@@ -93,7 +102,6 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
     }
   };
 
-  // IZMENA: Save podržava "notes" polje i async rad
   const handleSaveReservation = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingRes?.customer_name || !editingRes?.date || !editingRes?.time_slot) {
@@ -101,7 +109,8 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
       return;
     }
 
-    const isOccupied = reservations.some(r => 
+    // Provera zauzetosti
+    const isOccupied = (reservations || []).some(r => 
       r.date === editingRes.date && 
       r.time_slot === editingRes.time_slot && 
       r.id !== editingRes.id
@@ -112,9 +121,10 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
       return;
     }
     
+    // Čuvanje u bazu uključujući polje "notes"
     await dataService.saveReservation({
       ...editingRes,
-      notes: editingRes.notes || '', // Čuvamo opis
+      notes: editingRes.notes || '', 
       created_at: editingRes.created_at || new Date().toISOString(),
       status: editingRes.status || 'confirmed',
       guest_count: editingRes.guest_count || 30,
@@ -129,18 +139,19 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
   };
 
   const filteredReservations = useMemo(() => {
-    if (!reservations || !searchQuery) return reservations || [];
+    const res = reservations || [];
+    if (!searchQuery) return res;
     const q = searchQuery.toLowerCase();
-    return reservations.filter(r => 
-      r.customer_name?.toLowerCase().includes(q) || 
-      r.customer_phone?.includes(q) || 
-      r.date?.includes(q)
+    return res.filter(r => 
+      (r.customer_name || '').toLowerCase().includes(q) || 
+      (r.customer_phone || '').includes(q) || 
+      (r.date || '').includes(q)
     );
   }, [reservations, searchQuery]);
 
   const monthStats = useMemo(() => {
-    if (!reservations) return { count: 0, earnings: 0 };
-    const currentMonthReservations = reservations.filter(r => {
+    const res = reservations || [];
+    const currentMonthReservations = res.filter(r => {
       const d = new Date(r.date);
       return d.getMonth() === calMonth && d.getFullYear() === calYear;
     });
@@ -161,7 +172,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
     for (let i = 0; i < startDay; i++) cells.push(<div key={`empty-${i}`}></div>);
     for (let d = 1; d <= lastDay.getDate(); d++) {
       const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      const dayReservations = reservations ? reservations.filter(r => r.date === dateStr) : [];
+      const dayReservations = (reservations || []).filter(r => r.date === dateStr);
       const bookedCount = dayReservations.length;
       
       let statusColor = 'bg-green-100 text-green-700 hover:bg-green-200';
@@ -214,9 +225,9 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
 
   if (!isAuthenticated) {
     return (
-      <div className="fixed inset-0 z-[2000] bg-[#1f2e2a] flex items-center justify-center p-6">
+      <div className="fixed inset-0 z-[2000] bg-[#1f2e2a] flex items-center justify-center p-6 text-[#1f2e2a]">
         <div className="bg-white p-12 rounded-[40px] shadow-2xl w-full max-w-md border border-gray-100 animate-fade-up">
-          <h2 className="font-display text-3xl text-[#1f2e2a] font-bold mb-8 text-center">Admin Pristup</h2>
+          <h2 className="font-display text-3xl font-bold mb-8 text-center">Admin Pristup</h2>
           <form onSubmit={handleLogin} className="space-y-6">
             <input 
               type="password" 
@@ -228,7 +239,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
             />
             {error && <p className="text-red-500 text-xs font-bold uppercase text-center">{error}</p>}
             <button type="submit" className="w-full py-5 bg-[#c8a45d] text-[#1f2e2a] font-black rounded-3xl hover:brightness-110 transition-all uppercase tracking-widest">Pristupi Panelu</button>
-            <button type="button" onClick={onClose} className="w-full text-gray-400 font-bold uppercase text-[10px] tracking-widest">Nazad na sajt</button>
+            <button type="button" onClick={onClose} className="w-full text-gray-400 font-bold uppercase text-[10px] tracking-widest text-center mt-4">Nazad na sajt</button>
           </form>
         </div>
       </div>
@@ -236,7 +247,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
   }
 
   return (
-    <div className="fixed inset-0 z-[2000] bg-[#f5f5f0] overflow-auto flex flex-col">
+    <div className="fixed inset-0 z-[2000] bg-[#f5f5f0] overflow-auto flex flex-col text-[#1f2e2a]">
       <header className="bg-[#1f2e2a] p-6 text-white sticky top-0 z-50 shadow-2xl">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-4">
@@ -276,7 +287,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                       <div key={r.id} className="p-6 bg-gray-50 rounded-3xl border border-gray-100 flex justify-between items-center group">
                         <div className="space-y-1">
                           <div className="font-black uppercase text-sm">{r.customer_name} <span className="text-[#c8a45d] font-bold ml-2">({r.date})</span></div>
-                          <div className="text-[10px] text-gray-400 font-bold uppercase">📞 {r.customer_phone} | 🕒 {r.time_slot} | 📦 {PACKAGES[r.package_type]?.name}</div>
+                          <div className="text-[10px] text-gray-400 font-bold uppercase">📞 {r.customer_phone} | 🕒 {r.time_slot} | 📦 {PACKAGES[r.package_type as PackageKey]?.name}</div>
                           {r.notes && <div className="text-[9px] text-gray-500 italic mt-1">📝 {r.notes}</div>}
                         </div>
                         <button onClick={() => handleDelete(r.id)} className="p-3 bg-red-50 text-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white">🗑️</button>
@@ -299,7 +310,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                                   </div>
                                   <div className="text-[10px] text-gray-400 font-bold uppercase flex flex-col gap-1">
                                     <span className="text-[#c8a45d]">🕒 {r.time_slot}</span>
-                                    <span>📦 {PACKAGES[r.package_type]?.name}</span>
+                                    <span>📦 {PACKAGES[r.package_type as PackageKey]?.name}</span>
                                     <span>📞 {r.customer_phone}</span>
                                     {/* OVDE SE PRIKAZUJE OPIS U PREGLEDU DANA */}
                                     {r.notes && <span className="mt-1 text-gray-500 italic lowercase first-letter:uppercase bg-white p-2 rounded border border-gray-50">📝 {r.notes}</span>}
@@ -377,8 +388,8 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
 
       {/* Manual Comment Modal */}
       {showCommentModal && (
-        <div className="fixed inset-0 z-[500] bg-[#1f2e2a]/80 backdrop-blur-sm flex items-center justify-center p-6">
-          <div className="bg-white w-full max-w-lg p-10 rounded-[40px] shadow-2xl animate-fade-up">
+        <div className="fixed inset-0 z-[3000] bg-[#1f2e2a]/80 backdrop-blur-sm flex items-center justify-center p-6">
+          <div className="bg-white w-full max-w-lg p-10 rounded-[40px] shadow-2xl animate-fade-up text-[#1f2e2a]">
             <div className="flex justify-between items-center mb-8">
               <h2 className="font-display text-2xl font-bold uppercase">Ručni Utisak</h2>
               <button onClick={() => setShowCommentModal(false)} className="text-2xl">✕</button>
@@ -427,7 +438,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
       )}
 
       {showFormModal && (
-         <div className="fixed inset-0 z-[500] bg-[#1f2e2a]/80 backdrop-blur-sm flex items-center justify-center p-6">
+         <div className="fixed inset-0 z-[3000] bg-[#1f2e2a]/80 backdrop-blur-sm flex items-center justify-center p-6 text-[#1f2e2a]">
             <div className="bg-white w-full max-w-4xl p-10 md:p-14 rounded-[50px] shadow-2xl animate-fade-up max-h-[90vh] overflow-y-auto">
                <div className="flex justify-between items-center mb-10">
                   <h2 className="font-display text-3xl font-bold">Ručna Rezervacija</h2>
