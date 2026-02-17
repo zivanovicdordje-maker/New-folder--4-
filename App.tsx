@@ -103,15 +103,23 @@ const App: React.FC = () => {
   const isSlavlja = activePackage === 'slavlja';
 
 const refreshData = async () => {
-  const res = await dataService.getReservations();
-  const comm = await dataService.getComments();
-  setReservations(res);
-  setComments(comm);
-};
+    try {
+      const resData = await dataService.getReservations();
+      const commData = await dataService.getComments();
+      
+      // Osiguravamo da su podaci nizovi pre nego što ih sačuvamo
+      setReservations(Array.isArray(resData) ? resData : []);
+      setComments(Array.isArray(commData) ? commData : []);
+    } catch (err) {
+      console.error("Greška pri osvežavanju podataka:", err);
+    }
+  };
 
-  useEffect(() => {
-    refreshData();
-    const interval = setInterval(refreshData, 5000);
+useEffect(() => {
+    refreshData(); // Poziva se jednom kad se sajt učita
+    const interval = setInterval(() => {
+      refreshData();
+    }, 5000); // Svakih 5 sekundi proverava bazu
     return () => clearInterval(interval);
   }, []);
 
