@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { dataService } from './services/dataService'; 
-import { Reservation, PackageKey, Comment } from './types';
-import { PACKAGES, ALL_DAY_SLOTS } from './constants';
+import { dataService } from '../services/dataService'; 
+import { Reservation, PackageKey, Comment } from '../types';
+import { PACKAGES, ALL_DAY_SLOTS } from '../constants';
 
 interface AdminPortalProps {
   onClose: () => void;
