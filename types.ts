@@ -1,3 +1,4 @@
+// src/types.ts
 
 export type PackageKey = 'kids' | 'teen' | 'adult' | 'baby' | 'gender' | 'eighteen' | 'slavlja';
 
@@ -13,31 +14,33 @@ export interface ExtraServices {
 }
 
 export interface Reservation {
-  id: string;
-  package_type: PackageKey;
+  id?: number; // Supabase vraća broj (bigint). Opciono je jer ga nemamo pre čuvanja.
+  package_type: PackageKey | string; // Dozvoljavamo string zbog baze, ali preferiramo PackageKey
   space: 'open' | 'closed';
   guest_count: number;
   date: string;
   time_slot: string;
-  extras: ExtraServices;
+  extras: ExtraServices; // Supabase ovo automatski mapira iz JSONB
   total_price: number;
   deposit_paid: boolean;
   customer_name: string;
   customer_email: string;
   customer_phone: string;
   notes?: string;
-  status: 'confirmed' | 'pending' | 'cancelled';
-  created_at: string;
+  status: 'confirmed' | 'pending' | 'cancelled' | string; // Dozvoljavamo string zbog baze
+  created_at?: string; // Opciono, baza generiše
 }
 
 export interface Comment {
-  id: string;
+  id?: number; // Supabase vraća broj
   author: string;
   text: string;
   rating: number;
   date: string;
+  created_at?: string;
 }
 
+// Ovo ostaje isto jer se koristi samo za frontend logiku
 export interface PackageConfig {
   name: string;
   emoji: string;
