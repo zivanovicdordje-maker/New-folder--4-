@@ -111,12 +111,44 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
     }
   };
 
-  const handleSaveReservation = async (e: React.FormEvent) => {
+const handleSaveReservation = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingRes?.customer_name || !editingRes?.date || !editingRes?.time_slot) {
-      alert('Molimo popunite osnovna polja!');
-      return;
+    
+    // Pripremi podatke pažljivo
+    const reservationData = {
+      customer_name: editingRes?.customer_name,
+      customer_phone: editingRes?.customer_phone,
+      customer_email: editingRes?.customer_email || '',
+      date: editingRes?.date,
+      time_slot: editingRes?.time_slot,
+      package_type: editingRes?.package_type,
+      total_price: Number(editingRes?.total_price) || 0, // Osiguraj da je broj
+      guest_count: Number(editingRes?.guest_count) || 0, // Osiguraj da je broj
+      notes: editingRes?.notes || '',
+      status: 'confirmed',
+      deposit_paid: true,
+      space: editingRes?.space || 'open',
+      extras: editingRes?.extras || {} // Mora biti JSON u bazi
+    };
+
+    try {
+      // Pozovi servis
+      const result = await dataService.saveReservation(reservationData as any);
+      
+      // Ako tvoj dataService vraća grešku unutar objekta, proveri je
+      if (result && (result as any).error) {
+          throw (result as any).error;
+      }
+
+      alert('Uspešno sačuvano!');
+      await loadReservations();
+      setShowFormModal(false);
+    } catch (err: any) {
+      console.error("DETALJNA GREŠKA IZ SUPABASE-A:", err);
+      // Ovde će ti u konzoli sada pisati npr: "column status does not exist"
+      alert('Greška: ' + (err.message || 'Proverite konzolu za detalje'));
     }
+};
 
     const isOccupied = safeReservations.some(r => 
       r.date === editingRes.date && 
