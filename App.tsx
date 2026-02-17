@@ -25,7 +25,7 @@ const PKG_IMAGES: Record<PackageKey, string> = {
   kids: getImgPath("slike/paketi/deca.jpg"),
   teen: getImgPath("slike/paketi/zurka6.jpg"),
   adult: getImgPath("slike/paketi/zurka2.jpg"),
-  baby: getImgPath("slike/paketi/.jpg"),
+  baby: getImgPath("slike/galerija/rodjenje2.JPG"),
   gender: getImgPath("slike/paketi/gender.jpg"),
   eighteen: getImgPath("slike/paketi/zurka5.jpg"),
   slavlja: getImgPath("slike/paketi/slavlja.jpg")
