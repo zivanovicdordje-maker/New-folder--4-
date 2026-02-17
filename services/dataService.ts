@@ -98,5 +98,20 @@ export const dataService = {
       .eq('id', id);
     
     if (error) throw error;
+    // services/dataService.ts - DODAJ SAMO OVO RADI SIGURNOSTI
+  getReservations: async (): Promise<Reservation[]> => {
+    try {
+      const { data, error } = await supabase
+        .from('reservations')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Baza ne odgovara:', error);
+      return []; // Vraća prazan niz umesto da sruši sajt
+    }
+  },
   }
 };
