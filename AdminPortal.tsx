@@ -102,21 +102,67 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
   };
 
   const handleAddComment = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newComment.author && newComment.text) {
-      await dataService.saveComment(newComment);
+  e.preventDefault();
+  if (newComment.author && newComment.text) {
+    try {
+      await dataService.saveComment({
+        ...newComment,
+        date: new Date().toISOString() // Dodajemo datum ako baza zahteva
+      });
+      alert('Komentar objavljen!');
       await loadComments();
       setShowCommentModal(false);
       setNewComment({ author: '', text: '', rating: 5 });
+    } catch (err) {
+      console.error("Greška pri objavi komentara:", err);
+      alert('Neuspešna objava komentara.');
     }
-  };
+  }
+};
 
-  const handleSaveReservation = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingRes?.customer_name || !editingRes?.date || !editingRes?.time_slot) {
-      alert('Molimo popunite osnovna polja!');
+const handleSaveReservation = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!editingRes?.customer_name || !editingRes?.date || !editingRes?.time_slot) {
+    alert('Molimo popunite osnovna polja!');
+    return;
+  }
+
+  try {
+    // Provera zauzetosti (ovo već imaš)
+    const isOccupied = safeReservations.some(r => 
+      r.date === editingRes.date && 
+      r.time_slot === editingRes.time_slot && 
+      r.id !== editingRes.id
+    );
+
+    if (isOccupied) {
+      alert('Ovaj termin je VEĆ ZAUZET!');
       return;
     }
+    
+    // SLANJE PODATAKA
+    console.log("Šaljem rezervaciju:", editingRes); // Da vidiš šta šalješ
+    
+    await dataService.saveReservation({
+      ...editingRes,
+      notes: editingRes.notes || '',
+      created_at: editingRes.created_at || new Date().toISOString(),
+      status: editingRes.status || 'confirmed',
+      guest_count: editingRes.guest_count || 30,
+      total_price: editingRes.total_price || 0,
+      deposit_paid: true,
+      extras: editingRes.extras || { tables: 0, waiterHours: 0, ledKg: 0, photographer: false, decoration: false, catering: false, makeup: false, dj: false }
+    } as Omit<Reservation, 'id'>);
+    
+    alert('Rezervacija uspešno sačuvana!');
+    await loadReservations(); 
+    setShowFormModal(false);
+    setEditingRes(null);
+  } catch (err) {
+    console.error("GREŠKA PRI ČUVANJU:", err);
+    alert('Došlo je do greške pri čuvanju u bazu. Proverite konzolu (F12).');
+  }
+};
 
     const isOccupied = safeReservations.some(r => 
       r.date === editingRes.date && 
