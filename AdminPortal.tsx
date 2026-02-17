@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react';
-// ISPRAVLJENE PUTANJE ZA TVOJU STRUKTURU GDE SU FAJLOVI U ROOT-U
 import { dataService } from './services/dataService'; 
 import { Reservation, PackageKey, Comment } from './types';
 import { PACKAGES, ALL_DAY_SLOTS } from './constants';
@@ -40,23 +39,14 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
     }
   }, [isAuthenticated]);
 
-  // IZMENA: Funkcije su sada ASYNC da bi sačekale bazu (Supabase)
   const loadReservations = async () => {
-    try {
-      const data = await dataService.getReservations();
-      setReservations(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Greška pri učitavanju rezervacija:", err);
-    }
+    const data = await dataService.getReservations();
+    setReservations(Array.isArray(data) ? data : []);
   };
 
   const loadComments = async () => {
-    try {
-      const data = await dataService.getComments();
-      setComments(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Greška pri učitavanju komentara:", err);
-    }
+    const data = await dataService.getComments();
+    setComments(Array.isArray(data) ? data : []);
   };
 
   const handleLogin = (e: React.FormEvent) => {
@@ -69,7 +59,6 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
     }
   };
 
-  // IZMENA: Delete je sada async
   const handleDelete = async (id: string | number) => {
     if (window.confirm('Da li ste sigurni da želite da obrišete ovu rezervaciju?')) {
       await dataService.deleteReservation(id); 
@@ -109,7 +98,6 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
       return;
     }
 
-    // Provera zauzetosti
     const isOccupied = (reservations || []).some(r => 
       r.date === editingRes.date && 
       r.time_slot === editingRes.time_slot && 
@@ -121,10 +109,9 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
       return;
     }
     
-    // Čuvanje u bazu uključujući polje "notes"
     await dataService.saveReservation({
       ...editingRes,
-      notes: editingRes.notes || '', 
+      notes: editingRes.notes || '', // Dodato polje za opis
       created_at: editingRes.created_at || new Date().toISOString(),
       status: editingRes.status || 'confirmed',
       guest_count: editingRes.guest_count || 30,
@@ -139,10 +126,10 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
   };
 
   const filteredReservations = useMemo(() => {
-    const res = reservations || [];
-    if (!searchQuery) return res;
+    const resList = Array.isArray(reservations) ? reservations : [];
+    if (!searchQuery) return resList;
     const q = searchQuery.toLowerCase();
-    return res.filter(r => 
+    return resList.filter(r => 
       (r.customer_name || '').toLowerCase().includes(q) || 
       (r.customer_phone || '').includes(q) || 
       (r.date || '').includes(q)
@@ -150,8 +137,8 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
   }, [reservations, searchQuery]);
 
   const monthStats = useMemo(() => {
-    const res = reservations || [];
-    const currentMonthReservations = res.filter(r => {
+    const resList = Array.isArray(reservations) ? reservations : [];
+    const currentMonthReservations = resList.filter(r => {
       const d = new Date(r.date);
       return d.getMonth() === calMonth && d.getFullYear() === calYear;
     });
@@ -227,7 +214,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
     return (
       <div className="fixed inset-0 z-[2000] bg-[#1f2e2a] flex items-center justify-center p-6 text-[#1f2e2a]">
         <div className="bg-white p-12 rounded-[40px] shadow-2xl w-full max-w-md border border-gray-100 animate-fade-up">
-          <h2 className="font-display text-3xl font-bold mb-8 text-center">Admin Pristup</h2>
+          <h2 className="font-display text-3xl text-[#1f2e2a] font-bold mb-8 text-center">Admin Pristup</h2>
           <form onSubmit={handleLogin} className="space-y-6">
             <input 
               type="password" 
@@ -285,10 +272,10 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                     <h3 className="text-[11px] font-black uppercase tracking-widest text-[#c8a45d] mb-6">Rezultati pretrage: {filteredReservations.length}</h3>
                     {filteredReservations.map(r => (
                       <div key={r.id} className="p-6 bg-gray-50 rounded-3xl border border-gray-100 flex justify-between items-center group">
-                        <div className="space-y-1">
+                        <div className="space-y-1 text-left">
                           <div className="font-black uppercase text-sm">{r.customer_name} <span className="text-[#c8a45d] font-bold ml-2">({r.date})</span></div>
                           <div className="text-[10px] text-gray-400 font-bold uppercase">📞 {r.customer_phone} | 🕒 {r.time_slot} | 📦 {PACKAGES[r.package_type as PackageKey]?.name}</div>
-                          {r.notes && <div className="text-[9px] text-gray-500 italic mt-1">📝 {r.notes}</div>}
+                          {r.notes && <div className="text-[9px] text-gray-500 italic mt-1 bg-white p-2 rounded inline-block">📝 {r.notes}</div>}
                         </div>
                         <button onClick={() => handleDelete(r.id)} className="p-3 bg-red-50 text-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white">🗑️</button>
                       </div>
@@ -298,27 +285,26 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
             </div>
             <div className="space-y-8">
                 <div className="bg-white p-8 rounded-[40px] shadow-xl border border-gray-100 min-h-[400px]">
-                  <h4 className="text-[11px] font-black uppercase tracking-widest text-[#c8a45d] mb-6">Pregled Dana: {selectedAdminDate || 'Izaberi datum'}</h4>
+                  <h4 className="text-[11px] font-black uppercase tracking-widest text-[#c8a45d] mb-6 text-left">Pregled Dana: {selectedAdminDate || 'Izaberi datum'}</h4>
                   {selectedAdminDate ? (
                       <div className="space-y-6">
                         <div className="space-y-4">
-                            {reservations.filter(r => r.date === selectedAdminDate).map(r => (
-                              <div key={r.id} className="p-5 bg-gray-50 rounded-2xl border border-gray-100 group">
+                            {(reservations || []).filter(r => r.date === selectedAdminDate).map(r => (
+                              <div key={r.id} className="p-5 bg-gray-50 rounded-2xl border border-gray-100 group text-left">
                                   <div className="flex justify-between items-start mb-2">
                                     <span className="text-xs font-black uppercase text-[#1f2e2a]">{r.customer_name}</span>
-                                    <button onClick={() => handleDelete(r.id)} className="text-red-500 text-[10px] font-black uppercase opacity-0 group-hover:opacity-100 transition-opacity">Obriši</button>
+                                    <button onClick={() => handleDelete(r.id)} className="text-red-500 text-[10px] font-black uppercase">Obriši</button>
                                   </div>
                                   <div className="text-[10px] text-gray-400 font-bold uppercase flex flex-col gap-1">
                                     <span className="text-[#c8a45d]">🕒 {r.time_slot}</span>
                                     <span>📦 {PACKAGES[r.package_type as PackageKey]?.name}</span>
                                     <span>📞 {r.customer_phone}</span>
-                                    {/* OVDE SE PRIKAZUJE OPIS U PREGLEDU DANA */}
-                                    {r.notes && <span className="mt-1 text-gray-500 italic lowercase first-letter:uppercase bg-white p-2 rounded border border-gray-50">📝 {r.notes}</span>}
+                                    {r.notes && <span className="mt-2 p-2 bg-white rounded border border-gray-100 italic text-gray-600 normal-case">📝 OPIS: {r.notes}</span>}
                                     <span className="mt-2 pt-2 border-t border-gray-200 text-[#1f2e2a]">Ukupno: {r.total_price}€</span>
                                   </div>
                               </div>
                             ))}
-                            {reservations.filter(r => r.date === selectedAdminDate).length === 0 && (
+                            {(reservations || []).filter(r => r.date === selectedAdminDate).length === 0 && (
                               <p className="text-center py-10 text-gray-300 font-bold text-xs uppercase italic tracking-widest">Nema zakazanih termina</p>
                             )}
                         </div>
@@ -362,8 +348,8 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                 </button>
              </div>
              <div className="grid gap-6">
-                {comments.map(c => (
-                  <div key={c.id} className="p-8 bg-gray-50 rounded-[30px] border border-gray-100 group flex flex-col md:flex-row justify-between gap-6">
+                {(comments || []).map(c => (
+                  <div key={c.id} className="p-8 bg-gray-50 rounded-[30px] border border-gray-100 group flex flex-col md:flex-row justify-between gap-6 text-left">
                     <div className="space-y-3">
                        <div className="flex items-center gap-4">
                           <div className="w-12 h-12 bg-[#c8a45d] text-[#1f2e2a] rounded-full flex items-center justify-center font-black">{c.author[0]}</div>
@@ -380,7 +366,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                     </div>
                   </div>
                 ))}
-                {comments.length === 0 && <p className="text-center py-20 text-gray-300 font-bold uppercase italic tracking-widest">Nema ostavljenih komentara</p>}
+                {(!comments || comments.length === 0) && <p className="text-center py-20 text-gray-300 font-bold uppercase italic tracking-widest">Nema ostavljenih komentara</p>}
              </div>
           </div>
         )}
@@ -396,7 +382,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
             </div>
             <form onSubmit={handleAddComment} className="space-y-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Ocena</label>
+                <label className="text-[10px] font-black uppercase text-gray-400 ml-2 text-left block">Ocena</label>
                 <div className="flex gap-2 justify-center">
                   {[1, 2, 3, 4, 5].map(star => (
                     <button
@@ -410,22 +396,22 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                   ))}
                 </div>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 text-left">
                 <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Ime Autora</label>
                 <input 
                   required 
                   value={newComment.author} 
-                  onChange={e => setNewComment({...newComment, author: e.target.value})} 
+                  onChange={(e) => setNewComment({...newComment, author: e.target.value})} 
                   className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold" 
                 />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 text-left">
                 <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Tekst Utiska</label>
                 <textarea 
                   required 
                   rows={4}
                   value={newComment.text} 
-                  onChange={e => setNewComment({...newComment, text: e.target.value})} 
+                  onChange={(e) => setNewComment({...newComment, text: e.target.value})} 
                   className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-medium resize-none" 
                 />
               </div>
@@ -444,7 +430,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                   <h2 className="font-display text-3xl font-bold">Ručna Rezervacija</h2>
                   <button onClick={() => setShowFormModal(false)} className="text-2xl">✕</button>
                </div>
-               <form onSubmit={handleSaveReservation} className="grid md:grid-cols-2 gap-8">
+               <form onSubmit={handleSaveReservation} className="grid md:grid-cols-2 gap-8 text-left">
                   <div className="space-y-2">
                      <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Ime i Prezime</label>
                      <input required value={editingRes?.customer_name || ''} onChange={e => setEditingRes({...editingRes!, customer_name: e.target.value})} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold" />
@@ -512,7 +498,6 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                      <input type="number" value={editingRes?.total_price || 0} onChange={e => setEditingRes({...editingRes!, total_price: parseInt(e.target.value)})} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold text-[#c8a45d]" />
                   </div>
 
-                  {/* DODATO POLJE ZA OPIS / BELEŠKE */}
                   <div className="md:col-span-2 space-y-2">
                      <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Beleške (Važne informacije o rezervaciji)</label>
                      <textarea 
@@ -532,7 +517,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
          </div>
       )}
 
-      <footer className="p-12 text-center bg-gray-50 border-t border-gray-100 mt-auto">
+      <footer className="p-12 text-center bg-gray-50 border-t border-gray-100 mt-auto text-[#1f2e2a]">
          <div className="text-[10px] font-black uppercase tracking-[8px] text-gray-300 mb-2">Administracija Sistema</div>
          <div className="font-display italic text-gray-400 text-sm">Volim te mama</div>
       </footer>
