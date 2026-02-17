@@ -10,6 +10,7 @@ interface AdminPortalProps {
 const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
+  // Inicijalizujemo kao prazan niz da ne bi puklo pre učitavanja
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const [error, setError] = useState('');
@@ -32,6 +33,12 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
   const TEEN_SLOTS_3H = ['20:00–23:00', '21:00–00:00', '22:00–01:00'];
   const TEEN_SLOTS_4H = ['20:00–00:00', '21:00–01:00', '22:00–02:00'];
 
+  // --- SIGURNOSNA LOGIKA ---
+  // Ovo garantuje da nikada ne pukne "filter is not a function"
+  const safeReservations = Array.isArray(reservations) ? reservations : [];
+  const safeComments = Array.isArray(comments) ? comments : [];
+  // -------------------------
+
   useEffect(() => {
     if (isAuthenticated) {
       loadReservations();
@@ -40,13 +47,24 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
   }, [isAuthenticated]);
 
   const loadReservations = async () => {
-    const data = await dataService.getReservations();
-    setReservations(Array.isArray(data) ? data : []);
+    try {
+      const data = await dataService.getReservations();
+      // Ako dataService vrati null ili undefined, stavljamo prazan niz
+      setReservations(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error("Greška pri učitavanju rezervacija:", e);
+      setReservations([]);
+    }
   };
 
   const loadComments = async () => {
-    const data = await dataService.getComments();
-    setComments(Array.isArray(data) ? data : []);
+    try {
+      const data = await dataService.getComments();
+      setComments(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error("Greška pri učitavanju komentara:", e);
+      setComments([]);
+    }
   };
 
   const handleLogin = (e: React.FormEvent) => {
@@ -60,21 +78,23 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
   };
 
   const handleDelete = async (id: string | number) => {
-    if (window.confirm('Da li ste sigurni da želite da obrišete ovu rezervaciju?')) {
+    // eslint-disable-next-line no-restricted-globals
+    if (confirm('Da li ste sigurni da želite da obrišete ovu rezervaciju?')) {
       await dataService.deleteReservation(id); 
       await loadReservations();
     }
   };
 
   const handleDeleteComment = async (id: string | number) => {
-    if (window.confirm('Obrisati ovaj komentar?')) {
+    // eslint-disable-next-line no-restricted-globals
+    if (confirm('Obrisati ovaj komentar?')) {
       await dataService.deleteComment(id);
       await loadComments();
     }
   };
 
   const handleEditComment = async (id: string | number, oldText: string) => {
-    const newText = window.prompt('Izmenite komentar:', oldText);
+    const newText = prompt('Izmenite komentar:', oldText);
     if (newText !== null) {
       await dataService.updateComment(id, newText);
       await loadComments();
@@ -98,7 +118,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
       return;
     }
 
-    const isOccupied = (reservations || []).some(r => 
+    const isOccupied = safeReservations.some(r => 
       r.date === editingRes.date && 
       r.time_slot === editingRes.time_slot && 
       r.id !== editingRes.id
@@ -111,7 +131,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
     
     await dataService.saveReservation({
       ...editingRes,
-      notes: editingRes.notes || '', // Dodato polje za opis
+      notes: editingRes.notes || '',
       created_at: editingRes.created_at || new Date().toISOString(),
       status: editingRes.status || 'confirmed',
       guest_count: editingRes.guest_count || 30,
@@ -126,19 +146,17 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
   };
 
   const filteredReservations = useMemo(() => {
-    const resList = Array.isArray(reservations) ? reservations : [];
-    if (!searchQuery) return resList;
+    if (!searchQuery) return safeReservations;
     const q = searchQuery.toLowerCase();
-    return resList.filter(r => 
+    return safeReservations.filter(r => 
       (r.customer_name || '').toLowerCase().includes(q) || 
       (r.customer_phone || '').includes(q) || 
       (r.date || '').includes(q)
     );
-  }, [reservations, searchQuery]);
+  }, [safeReservations, searchQuery]);
 
   const monthStats = useMemo(() => {
-    const resList = Array.isArray(reservations) ? reservations : [];
-    const currentMonthReservations = resList.filter(r => {
+    const currentMonthReservations = safeReservations.filter(r => {
       const d = new Date(r.date);
       return d.getMonth() === calMonth && d.getFullYear() === calYear;
     });
@@ -147,7 +165,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
       count: currentMonthReservations.length,
       earnings: totalEarnings
     };
-  }, [reservations, calMonth, calYear]);
+  }, [safeReservations, calMonth, calYear]);
 
   const renderAdminCalendar = () => {
     const days = ['Pon', 'Uto', 'Sre', 'Čet', 'Pet', 'Sub', 'Ned'];
@@ -159,7 +177,9 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
     for (let i = 0; i < startDay; i++) cells.push(<div key={`empty-${i}`}></div>);
     for (let d = 1; d <= lastDay.getDate(); d++) {
       const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      const dayReservations = (reservations || []).filter(r => r.date === dateStr);
+      
+      // OVDE JE BILA GREŠKA - sada koristimo safeReservations
+      const dayReservations = safeReservations.filter(r => r.date === dateStr);
       const bookedCount = dayReservations.length;
       
       let statusColor = 'bg-green-100 text-green-700 hover:bg-green-200';
@@ -175,7 +195,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
           <span className="font-black text-xs md:text-sm">{d}</span>
           <div className="flex flex-col gap-0.5 overflow-hidden">
              {dayReservations.map(r => (
-               <div key={r.id} className="text-[7px] truncate font-bold bg-white/50 px-1 rounded leading-tight">{r.customer_name}</div>
+               <div key={r.id || Math.random()} className="text-[7px] truncate font-bold bg-white/50 px-1 rounded leading-tight">{r.customer_name}</div>
              ))}
              {bookedCount === 0 && <div className="text-[9px] opacity-40 uppercase font-bold italic">Slobodno</div>}
           </div>
@@ -239,7 +259,8 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-4">
              <div className="w-10 h-10 rounded-full overflow-hidden bg-white/10 p-1">
-                <img src="./slike/galerija/logo.jpg" alt="Logo" className="w-full h-full object-cover rounded-full" />
+                {/* Koristimo sigurnu putanju za sliku ili placeholder */}
+                <div className="w-full h-full bg-[#c8a45d] rounded-full flex items-center justify-center font-bold text-[#1f2e2a]">I</div>
              </div>
              <h1 className="font-display text-2xl font-bold tracking-widest uppercase">Indođija <span className="text-[#c8a45d]">Admin</span></h1>
           </div>
@@ -277,7 +298,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                           <div className="text-[10px] text-gray-400 font-bold uppercase">📞 {r.customer_phone} | 🕒 {r.time_slot} | 📦 {PACKAGES[r.package_type as PackageKey]?.name}</div>
                           {r.notes && <div className="text-[9px] text-gray-500 italic mt-1 bg-white p-2 rounded inline-block">📝 {r.notes}</div>}
                         </div>
-                        <button onClick={() => handleDelete(r.id)} className="p-3 bg-red-50 text-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white">🗑️</button>
+                        <button onClick={() => r.id && handleDelete(r.id)} className="p-3 bg-red-50 text-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white">🗑️</button>
                       </div>
                     ))}
                   </div>
@@ -289,11 +310,11 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                   {selectedAdminDate ? (
                       <div className="space-y-6">
                         <div className="space-y-4">
-                            {(reservations || []).filter(r => r.date === selectedAdminDate).map(r => (
+                            {safeReservations.filter(r => r.date === selectedAdminDate).map(r => (
                               <div key={r.id} className="p-5 bg-gray-50 rounded-2xl border border-gray-100 group text-left">
                                   <div className="flex justify-between items-start mb-2">
                                     <span className="text-xs font-black uppercase text-[#1f2e2a]">{r.customer_name}</span>
-                                    <button onClick={() => handleDelete(r.id)} className="text-red-500 text-[10px] font-black uppercase">Obriši</button>
+                                    <button onClick={() => r.id && handleDelete(r.id)} className="text-red-500 text-[10px] font-black uppercase">Obriši</button>
                                   </div>
                                   <div className="text-[10px] text-gray-400 font-bold uppercase flex flex-col gap-1">
                                     <span className="text-[#c8a45d]">🕒 {r.time_slot}</span>
@@ -304,7 +325,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                                   </div>
                               </div>
                             ))}
-                            {(reservations || []).filter(r => r.date === selectedAdminDate).length === 0 && (
+                            {safeReservations.filter(r => r.date === selectedAdminDate).length === 0 && (
                               <p className="text-center py-10 text-gray-300 font-bold text-xs uppercase italic tracking-widest">Nema zakazanih termina</p>
                             )}
                         </div>
@@ -348,31 +369,31 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                 </button>
              </div>
              <div className="grid gap-6">
-                {(comments || []).map(c => (
+                {safeComments.map(c => (
                   <div key={c.id} className="p-8 bg-gray-50 rounded-[30px] border border-gray-100 group flex flex-col md:flex-row justify-between gap-6 text-left">
                     <div className="space-y-3">
                        <div className="flex items-center gap-4">
                           <div className="w-12 h-12 bg-[#c8a45d] text-[#1f2e2a] rounded-full flex items-center justify-center font-black">{c.author[0]}</div>
                           <div>
                              <div className="font-black uppercase text-sm">{c.author} <span className="text-[var(--gold)] ml-2">{'★'.repeat(c.rating)}</span></div>
-                             <div className="text-[10px] text-gray-400 font-bold uppercase">{new Date(c.date).toLocaleDateString('sr-RS')}</div>
+                             <div className="text-[10px] text-gray-400 font-bold uppercase">{c.date ? new Date(c.date).toLocaleDateString('sr-RS') : 'N/A'}</div>
                           </div>
                        </div>
                        <p className="text-gray-600 text-sm leading-relaxed italic">"{c.text}"</p>
                     </div>
                     <div className="flex items-center gap-3">
-                       <button onClick={() => handleEditComment(c.id, c.text)} className="px-6 py-3 bg-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-sm hover:bg-[#c8a45d] hover:text-white transition-all">Izmeni</button>
-                       <button onClick={() => handleDeleteComment(c.id)} className="px-6 py-3 bg-red-50 text-red-500 text-[10px] font-black uppercase tracking-widest rounded-full hover:bg-red-500 hover:text-white transition-all">Obriši</button>
+                       <button onClick={() => c.id && handleEditComment(c.id, c.text)} className="px-6 py-3 bg-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-sm hover:bg-[#c8a45d] hover:text-white transition-all">Izmeni</button>
+                       <button onClick={() => c.id && handleDeleteComment(c.id)} className="px-6 py-3 bg-red-50 text-red-500 text-[10px] font-black uppercase tracking-widest rounded-full hover:bg-red-500 hover:text-white transition-all">Obriši</button>
                     </div>
                   </div>
                 ))}
-                {(!comments || comments.length === 0) && <p className="text-center py-20 text-gray-300 font-bold uppercase italic tracking-widest">Nema ostavljenih komentara</p>}
+                {(safeComments.length === 0) && <p className="text-center py-20 text-gray-300 font-bold uppercase italic tracking-widest">Nema ostavljenih komentara</p>}
              </div>
           </div>
         )}
       </main>
 
-      {/* Manual Comment Modal */}
+      {/* MODALI (ostaju isti, ali sa sigurnim pozivima) */}
       {showCommentModal && (
         <div className="fixed inset-0 z-[3000] bg-[#1f2e2a]/80 backdrop-blur-sm flex items-center justify-center p-6">
           <div className="bg-white w-full max-w-lg p-10 rounded-[40px] shadow-2xl animate-fade-up text-[#1f2e2a]">
@@ -519,7 +540,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
 
       <footer className="p-12 text-center bg-gray-50 border-t border-gray-100 mt-auto text-[#1f2e2a]">
          <div className="text-[10px] font-black uppercase tracking-[8px] text-gray-300 mb-2">Administracija Sistema</div>
-         <div className="font-display italic text-gray-400 text-sm">Volim te mama</div>
+         <div className="font-display italic text-gray-400 text-sm">Volim te mama❤️ </div>
       </footer>
     </div>
   );
