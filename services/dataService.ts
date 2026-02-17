@@ -11,27 +11,28 @@ export const dataService = {
   // --- REZERVACIJE ---
 
   getReservations: async (): Promise<Reservation[]> => {
-    const { data, error } = await supabase
-      .from('reservations')
-      .select('*')
-      .order('created_at', { ascending: false });
-    
-    if (error) {
-      console.error('Greška pri čitanju rezervacija:', error);
-      return [];
+    try {
+      const { data, error } = await supabase
+        .from('reservations')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Baza ne odgovara:', error);
+      return []; 
     }
-    return data || [];
   },
 
   isSlotOccupied: async (date: string, timeSlot: string): Promise<boolean> => {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('reservations')
       .select('id')
       .eq('date', date)
       .eq('time_slot', timeSlot)
       .eq('status', 'confirmed');
     
-    if (error) return false;
     return data && data.length > 0;
   },
 
@@ -61,7 +62,6 @@ export const dataService = {
       .order('created_at', { ascending: false });
 
     if (error) {
-      // Ako baza ne radi, vraćamo tvoje default komentare kao rezervu
       return [
         { id: '1', author: 'Jelena M.', text: 'Prelepo mesto, deca su bila oduševljena igralištem!', rating: 5, date: new Date().toISOString() },
         { id: '2', author: 'Marko K.', text: 'Odlična organizacija za punoletstvo. Sve preporuke.', rating: 5, date: new Date().toISOString() }
@@ -98,20 +98,5 @@ export const dataService = {
       .eq('id', id);
     
     if (error) throw error;
-    // services/dataService.ts - DODAJ SAMO OVO RADI SIGURNOSTI
-  getReservations: async (): Promise<Reservation[]> => {
-    try {
-      const { data, error } = await supabase
-        .from('reservations')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data || [];
-    } catch (error) {
-      console.error('Baza ne odgovara:', error);
-      return []; // Vraća prazan niz umesto da sruši sajt
-    }
-  },
   }
 };
