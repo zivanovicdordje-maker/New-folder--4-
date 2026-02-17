@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
-import { dataService } from '../services/dataService';
-import { Reservation, PackageKey, Comment } from '../types';
-import { PACKAGES, ALL_DAY_SLOTS } from '../constants';
+import { dataService } from './services/dataService'; 
+import { Reservation, PackageKey, Comment } from './types';
+import { PACKAGES, ALL_DAY_SLOTS } from './constants';
 
 interface AdminPortalProps {
   onClose: () => void;
@@ -25,9 +24,13 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [editingRes, setEditingRes] = useState<Partial<Reservation> | null>(null);
   const [newComment, setNewComment] = useState({ author: '', text: '', rating: 5 });
+  const [adminTeenDuration, setAdminTeenDuration] = useState<3 | 4>(3);
 
   const ADMIN_PASSWORD = 'Indodjija2026';
   const months = ['Januar', 'Februar', 'Mart', 'April', 'Maj', 'Jun', 'Jul', 'Avgust', 'Septembar', 'Oktobar', 'Novembar', 'Decembar'];
+
+  const TEEN_SLOTS_3H = ['20:00–23:00', '21:00–00:00', '22:00–01:00'];
+  const TEEN_SLOTS_4H = ['20:00–00:00', '21:00–01:00', '22:00–02:00'];
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -36,12 +39,14 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
     }
   }, [isAuthenticated]);
 
-  const loadReservations = () => {
-    setReservations(dataService.getReservations());
+  const loadReservations = async () => {
+    const data = await dataService.getReservations();
+    setReservations(Array.isArray(data) ? data : []);
   };
 
-  const loadComments = () => {
-    setComments(dataService.getComments());
+  const loadComments = async () => {
+    const data = await dataService.getComments();
+    setComments(Array.isArray(data) ? data : []);
   };
 
   const handleLogin = (e: React.FormEvent) => {
@@ -54,46 +59,46 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
     }
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string | number) => {
     if (window.confirm('Da li ste sigurni da želite da obrišete ovu rezervaciju?')) {
-      dataService.deleteReservation(id); 
-      loadReservations();
+      await dataService.deleteReservation(id); 
+      await loadReservations();
     }
   };
 
-  const handleDeleteComment = (id: string) => {
+  const handleDeleteComment = async (id: string | number) => {
     if (window.confirm('Obrisati ovaj komentar?')) {
-      dataService.deleteComment(id);
-      loadComments();
+      await dataService.deleteComment(id);
+      await loadComments();
     }
   };
 
-  const handleEditComment = (id: string, oldText: string) => {
+  const handleEditComment = async (id: string | number, oldText: string) => {
     const newText = window.prompt('Izmenite komentar:', oldText);
     if (newText !== null) {
-      dataService.updateComment(id, newText);
-      loadComments();
+      await dataService.updateComment(id, newText);
+      await loadComments();
     }
   };
 
-  const handleAddComment = (e: React.FormEvent) => {
+  const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newComment.author && newComment.text) {
-      dataService.saveComment(newComment);
-      loadComments();
+      await dataService.saveComment(newComment);
+      await loadComments();
       setShowCommentModal(false);
       setNewComment({ author: '', text: '', rating: 5 });
     }
   };
 
-  const handleSaveReservation = (e: React.FormEvent) => {
+  const handleSaveReservation = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingRes?.customer_name || !editingRes?.date || !editingRes?.time_slot) {
       alert('Molimo popunite osnovna polja!');
       return;
     }
 
-    const isOccupied = reservations.some(r => 
+    const isOccupied = (reservations || []).some(r => 
       r.date === editingRes.date && 
       r.time_slot === editingRes.time_slot && 
       r.id !== editingRes.id
@@ -104,8 +109,9 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
       return;
     }
     
-    dataService.saveReservation({
+    await dataService.saveReservation({
       ...editingRes,
+      notes: editingRes.notes || '', // Dodato polje za opis
       created_at: editingRes.created_at || new Date().toISOString(),
       status: editingRes.status || 'confirmed',
       guest_count: editingRes.guest_count || 30,
@@ -114,23 +120,25 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
       extras: editingRes.extras || { tables: 0, waiterHours: 0, ledKg: 0, photographer: false, decoration: false, catering: false, makeup: false, dj: false }
     } as Omit<Reservation, 'id'>);
     
-    loadReservations(); 
+    await loadReservations(); 
     setShowFormModal(false);
     setEditingRes(null);
   };
 
   const filteredReservations = useMemo(() => {
-    if (!searchQuery) return reservations;
+    const resList = Array.isArray(reservations) ? reservations : [];
+    if (!searchQuery) return resList;
     const q = searchQuery.toLowerCase();
-    return reservations.filter(r => 
-      r.customer_name.toLowerCase().includes(q) || 
-      r.customer_phone.includes(q) || 
-      r.date.includes(q)
+    return resList.filter(r => 
+      (r.customer_name || '').toLowerCase().includes(q) || 
+      (r.customer_phone || '').includes(q) || 
+      (r.date || '').includes(q)
     );
   }, [reservations, searchQuery]);
 
   const monthStats = useMemo(() => {
-    const currentMonthReservations = reservations.filter(r => {
+    const resList = Array.isArray(reservations) ? reservations : [];
+    const currentMonthReservations = resList.filter(r => {
       const d = new Date(r.date);
       return d.getMonth() === calMonth && d.getFullYear() === calYear;
     });
@@ -151,7 +159,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
     for (let i = 0; i < startDay; i++) cells.push(<div key={`empty-${i}`}></div>);
     for (let d = 1; d <= lastDay.getDate(); d++) {
       const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      const dayReservations = reservations.filter(r => r.date === dateStr);
+      const dayReservations = (reservations || []).filter(r => r.date === dateStr);
       const bookedCount = dayReservations.length;
       
       let statusColor = 'bg-green-100 text-green-700 hover:bg-green-200';
@@ -204,7 +212,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
 
   if (!isAuthenticated) {
     return (
-      <div className="fixed inset-0 z-[2000] bg-[#1f2e2a] flex items-center justify-center p-6">
+      <div className="fixed inset-0 z-[2000] bg-[#1f2e2a] flex items-center justify-center p-6 text-[#1f2e2a]">
         <div className="bg-white p-12 rounded-[40px] shadow-2xl w-full max-w-md border border-gray-100 animate-fade-up">
           <h2 className="font-display text-3xl text-[#1f2e2a] font-bold mb-8 text-center">Admin Pristup</h2>
           <form onSubmit={handleLogin} className="space-y-6">
@@ -218,7 +226,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
             />
             {error && <p className="text-red-500 text-xs font-bold uppercase text-center">{error}</p>}
             <button type="submit" className="w-full py-5 bg-[#c8a45d] text-[#1f2e2a] font-black rounded-3xl hover:brightness-110 transition-all uppercase tracking-widest">Pristupi Panelu</button>
-            <button type="button" onClick={onClose} className="w-full text-gray-400 font-bold uppercase text-[10px] tracking-widest">Nazad na sajt</button>
+            <button type="button" onClick={onClose} className="w-full text-gray-400 font-bold uppercase text-[10px] tracking-widest text-center mt-4">Nazad na sajt</button>
           </form>
         </div>
       </div>
@@ -226,7 +234,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
   }
 
   return (
-    <div className="fixed inset-0 z-[2000] bg-[#f5f5f0] overflow-auto flex flex-col">
+    <div className="fixed inset-0 z-[2000] bg-[#f5f5f0] overflow-auto flex flex-col text-[#1f2e2a]">
       <header className="bg-[#1f2e2a] p-6 text-white sticky top-0 z-50 shadow-2xl">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-4">
@@ -264,9 +272,10 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                     <h3 className="text-[11px] font-black uppercase tracking-widest text-[#c8a45d] mb-6">Rezultati pretrage: {filteredReservations.length}</h3>
                     {filteredReservations.map(r => (
                       <div key={r.id} className="p-6 bg-gray-50 rounded-3xl border border-gray-100 flex justify-between items-center group">
-                        <div className="space-y-1">
+                        <div className="space-y-1 text-left">
                           <div className="font-black uppercase text-sm">{r.customer_name} <span className="text-[#c8a45d] font-bold ml-2">({r.date})</span></div>
-                          <div className="text-[10px] text-gray-400 font-bold uppercase">📞 {r.customer_phone} | 🕒 {r.time_slot} | 📦 {PACKAGES[r.package_type]?.name}</div>
+                          <div className="text-[10px] text-gray-400 font-bold uppercase">📞 {r.customer_phone} | 🕒 {r.time_slot} | 📦 {PACKAGES[r.package_type as PackageKey]?.name}</div>
+                          {r.notes && <div className="text-[9px] text-gray-500 italic mt-1 bg-white p-2 rounded inline-block">📝 {r.notes}</div>}
                         </div>
                         <button onClick={() => handleDelete(r.id)} className="p-3 bg-red-50 text-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white">🗑️</button>
                       </div>
@@ -276,25 +285,26 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
             </div>
             <div className="space-y-8">
                 <div className="bg-white p-8 rounded-[40px] shadow-xl border border-gray-100 min-h-[400px]">
-                  <h4 className="text-[11px] font-black uppercase tracking-widest text-[#c8a45d] mb-6">Pregled Dana: {selectedAdminDate || 'Izaberi datum'}</h4>
+                  <h4 className="text-[11px] font-black uppercase tracking-widest text-[#c8a45d] mb-6 text-left">Pregled Dana: {selectedAdminDate || 'Izaberi datum'}</h4>
                   {selectedAdminDate ? (
                       <div className="space-y-6">
                         <div className="space-y-4">
-                            {reservations.filter(r => r.date === selectedAdminDate).map(r => (
-                              <div key={r.id} className="p-5 bg-gray-50 rounded-2xl border border-gray-100 group">
+                            {(reservations || []).filter(r => r.date === selectedAdminDate).map(r => (
+                              <div key={r.id} className="p-5 bg-gray-50 rounded-2xl border border-gray-100 group text-left">
                                   <div className="flex justify-between items-start mb-2">
                                     <span className="text-xs font-black uppercase text-[#1f2e2a]">{r.customer_name}</span>
-                                    <button onClick={() => handleDelete(r.id)} className="text-red-500 text-[10px] font-black uppercase opacity-0 group-hover:opacity-100 transition-opacity">Obriši</button>
+                                    <button onClick={() => handleDelete(r.id)} className="text-red-500 text-[10px] font-black uppercase">Obriši</button>
                                   </div>
                                   <div className="text-[10px] text-gray-400 font-bold uppercase flex flex-col gap-1">
                                     <span className="text-[#c8a45d]">🕒 {r.time_slot}</span>
-                                    <span>📦 {PACKAGES[r.package_type]?.name}</span>
+                                    <span>📦 {PACKAGES[r.package_type as PackageKey]?.name}</span>
                                     <span>📞 {r.customer_phone}</span>
+                                    {r.notes && <span className="mt-2 p-2 bg-white rounded border border-gray-100 italic text-gray-600 normal-case">📝 OPIS: {r.notes}</span>}
                                     <span className="mt-2 pt-2 border-t border-gray-200 text-[#1f2e2a]">Ukupno: {r.total_price}€</span>
                                   </div>
                               </div>
                             ))}
-                            {reservations.filter(r => r.date === selectedAdminDate).length === 0 && (
+                            {(reservations || []).filter(r => r.date === selectedAdminDate).length === 0 && (
                               <p className="text-center py-10 text-gray-300 font-bold text-xs uppercase italic tracking-widest">Nema zakazanih termina</p>
                             )}
                         </div>
@@ -309,6 +319,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                             customer_name: '',
                             customer_phone: '',
                             customer_email: '',
+                            notes: '',
                             extras: { tables: 0, waiterHours: 0, ledKg: 0, photographer: false, decoration: false, catering: false, makeup: false, dj: false }
                           });
                           setShowFormModal(true);
@@ -337,8 +348,8 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                 </button>
              </div>
              <div className="grid gap-6">
-                {comments.map(c => (
-                  <div key={c.id} className="p-8 bg-gray-50 rounded-[30px] border border-gray-100 group flex flex-col md:flex-row justify-between gap-6">
+                {(comments || []).map(c => (
+                  <div key={c.id} className="p-8 bg-gray-50 rounded-[30px] border border-gray-100 group flex flex-col md:flex-row justify-between gap-6 text-left">
                     <div className="space-y-3">
                        <div className="flex items-center gap-4">
                           <div className="w-12 h-12 bg-[#c8a45d] text-[#1f2e2a] rounded-full flex items-center justify-center font-black">{c.author[0]}</div>
@@ -355,7 +366,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                     </div>
                   </div>
                 ))}
-                {comments.length === 0 && <p className="text-center py-20 text-gray-300 font-bold uppercase italic tracking-widest">Nema ostavljenih komentara</p>}
+                {(!comments || comments.length === 0) && <p className="text-center py-20 text-gray-300 font-bold uppercase italic tracking-widest">Nema ostavljenih komentara</p>}
              </div>
           </div>
         )}
@@ -363,15 +374,15 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
 
       {/* Manual Comment Modal */}
       {showCommentModal && (
-        <div className="fixed inset-0 z-[500] bg-[#1f2e2a]/80 backdrop-blur-sm flex items-center justify-center p-6">
-          <div className="bg-white w-full max-w-lg p-10 rounded-[40px] shadow-2xl animate-fade-up">
+        <div className="fixed inset-0 z-[3000] bg-[#1f2e2a]/80 backdrop-blur-sm flex items-center justify-center p-6">
+          <div className="bg-white w-full max-w-lg p-10 rounded-[40px] shadow-2xl animate-fade-up text-[#1f2e2a]">
             <div className="flex justify-between items-center mb-8">
               <h2 className="font-display text-2xl font-bold uppercase">Ručni Utisak</h2>
               <button onClick={() => setShowCommentModal(false)} className="text-2xl">✕</button>
             </div>
             <form onSubmit={handleAddComment} className="space-y-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Ocena</label>
+                <label className="text-[10px] font-black uppercase text-gray-400 ml-2 text-left block">Ocena</label>
                 <div className="flex gap-2 justify-center">
                   {[1, 2, 3, 4, 5].map(star => (
                     <button
@@ -385,22 +396,22 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                   ))}
                 </div>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 text-left">
                 <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Ime Autora</label>
                 <input 
                   required 
                   value={newComment.author} 
-                  onChange={e => setNewComment({...newComment, author: e.target.value})} 
+                  onChange={(e) => setNewComment({...newComment, author: e.target.value})} 
                   className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold" 
                 />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 text-left">
                 <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Tekst Utiska</label>
                 <textarea 
                   required 
                   rows={4}
                   value={newComment.text} 
-                  onChange={e => setNewComment({...newComment, text: e.target.value})} 
+                  onChange={(e) => setNewComment({...newComment, text: e.target.value})} 
                   className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-medium resize-none" 
                 />
               </div>
@@ -413,13 +424,13 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
       )}
 
       {showFormModal && (
-         <div className="fixed inset-0 z-[500] bg-[#1f2e2a]/80 backdrop-blur-sm flex items-center justify-center p-6">
+         <div className="fixed inset-0 z-[3000] bg-[#1f2e2a]/80 backdrop-blur-sm flex items-center justify-center p-6 text-[#1f2e2a]">
             <div className="bg-white w-full max-w-4xl p-10 md:p-14 rounded-[50px] shadow-2xl animate-fade-up max-h-[90vh] overflow-y-auto">
                <div className="flex justify-between items-center mb-10">
                   <h2 className="font-display text-3xl font-bold">Ručna Rezervacija</h2>
                   <button onClick={() => setShowFormModal(false)} className="text-2xl">✕</button>
                </div>
-               <form onSubmit={handleSaveReservation} className="grid md:grid-cols-2 gap-8">
+               <form onSubmit={handleSaveReservation} className="grid md:grid-cols-2 gap-8 text-left">
                   <div className="space-y-2">
                      <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Ime i Prezime</label>
                      <input required value={editingRes?.customer_name || ''} onChange={e => setEditingRes({...editingRes!, customer_name: e.target.value})} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold" />
@@ -430,7 +441,14 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                   </div>
                   <div className="space-y-2">
                      <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Paket</label>
-                     <select value={editingRes?.package_type} onChange={e => setEditingRes({...editingRes!, package_type: e.target.value as PackageKey})} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold">
+                     <select 
+                        value={editingRes?.package_type} 
+                        onChange={e => {
+                          const pkg = e.target.value as PackageKey;
+                          setEditingRes({...editingRes!, package_type: pkg, time_slot: pkg === 'teen' ? TEEN_SLOTS_3H[0] : ALL_DAY_SLOTS[0]});
+                        }} 
+                        className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold"
+                     >
                         {Object.keys(PACKAGES).map(k => <option key={k} value={k}>{PACKAGES[k as PackageKey].name}</option>)}
                      </select>
                   </div>
@@ -438,20 +456,59 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                      <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Datum</label>
                      <input type="date" value={editingRes?.date || ''} onChange={e => setEditingRes({...editingRes!, date: e.target.value})} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold" />
                   </div>
+                  
+                  {editingRes?.package_type === 'teen' && (
+                    <div className="space-y-2">
+                       <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Trajanje Žurke</label>
+                       <div className="flex gap-4">
+                          {[3, 4].map(dur => (
+                             <button 
+                               key={dur} 
+                               type="button"
+                               onClick={() => {
+                                 setAdminTeenDuration(dur as 3 | 4);
+                                 setEditingRes({...editingRes!, time_slot: dur === 3 ? TEEN_SLOTS_3H[0] : TEEN_SLOTS_4H[0]});
+                               }}
+                               className={`flex-1 py-4 rounded-2xl font-black uppercase text-[10px] border-2 transition-all ${adminTeenDuration === dur ? 'border-[#c8a45d] bg-[#c8a45d]/5 text-[#c8a45d]' : 'border-gray-100 bg-gray-50'}`}
+                             >
+                               {dur} Sata
+                             </button>
+                          ))}
+                       </div>
+                    </div>
+                  )}
+
                   <div className="space-y-2">
-                     <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Termin</label>
+                     <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Termin (Od - Do)</label>
                      <select value={editingRes?.time_slot || ''} onChange={e => setEditingRes({...editingRes!, time_slot: e.target.value})} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold">
-                        {ALL_DAY_SLOTS.map(s => <option key={s} value={s}>{s}</option>)}
+                        {editingRes?.package_type === 'teen' ? (
+                          adminTeenDuration === 3 ? TEEN_SLOTS_3H.map(s => <option key={s} value={s}>{s}</option>) : TEEN_SLOTS_4H.map(s => <option key={s} value={s}>{s}</option>)
+                        ) : (
+                          ALL_DAY_SLOTS.map(s => <option key={s} value={s}>{s}</option>)
+                        )}
                         <option value="custom">Proizvoljan (upiši ručno)</option>
                      </select>
                      {editingRes?.time_slot === 'custom' && (
                         <input className="w-full mt-2 p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold" placeholder="npr. 12:00–16:00" onChange={e => setEditingRes({...editingRes!, time_slot: e.target.value})} />
                      )}
                   </div>
+
                   <div className="space-y-2">
                      <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Ukupna Cena (€)</label>
                      <input type="number" value={editingRes?.total_price || 0} onChange={e => setEditingRes({...editingRes!, total_price: parseInt(e.target.value)})} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold text-[#c8a45d]" />
                   </div>
+
+                  <div className="md:col-span-2 space-y-2">
+                     <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Beleške (Važne informacije o rezervaciji)</label>
+                     <textarea 
+                        value={editingRes?.notes || ''} 
+                        onChange={e => setEditingRes({...editingRes!, notes: e.target.value})} 
+                        rows={3}
+                        className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-medium resize-none placeholder:text-gray-300"
+                        placeholder="Npr. Rođendan od male Milice, donose svoju tortu..."
+                     />
+                  </div>
+
                   <button type="submit" className="md:col-span-2 py-5 bg-[#1f2e2a] text-[#c8a45d] font-black rounded-3xl uppercase tracking-widest text-sm hover:brightness-125 transition-all shadow-xl mt-6">
                      Potvrdi i Sačuvaj
                   </button>
@@ -460,7 +517,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
          </div>
       )}
 
-      <footer className="p-12 text-center bg-gray-50 border-t border-gray-100 mt-auto">
+      <footer className="p-12 text-center bg-gray-50 border-t border-gray-100 mt-auto text-[#1f2e2a]">
          <div className="text-[10px] font-black uppercase tracking-[8px] text-gray-300 mb-2">Administracija Sistema</div>
          <div className="font-display italic text-gray-400 text-sm">Volim te mama</div>
       </footer>
