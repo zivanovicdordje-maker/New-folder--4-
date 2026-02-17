@@ -102,10 +102,12 @@ const App: React.FC = () => {
   const cartCount = (selectedDate && selectedTimeSlot) ? 1 : 0;
   const isSlavlja = activePackage === 'slavlja';
 
-  const refreshData = () => {
-    setReservations(dataService.getReservations());
-    setComments(dataService.getComments());
-  };
+const refreshData = async () => {
+  const res = await dataService.getReservations();
+  const comm = await dataService.getComments();
+  setReservations(res);
+  setComments(comm);
+};
 
   useEffect(() => {
     refreshData();
