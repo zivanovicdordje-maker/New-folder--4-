@@ -24,8 +24,8 @@ const getImgPath = (path: string) => {
 const PKG_IMAGES: Record<PackageKey, string> = {
   kids: getImgPath("slike/paketi/deca.jpg"),
   teen: getImgPath("slike/paketi/zurka6.jpg"),
-  adult: getImgPath("slike/paketi/rodjenje.jpg"),
-  baby: getImgPath("slike/paketi/rodjenje1.jpg"),
+  adult: getImgPath("slike/paketi/zurka2.jpg"),
+  baby: getImgPath("slike/paketi/.jpg"),
   gender: getImgPath("slike/paketi/gender.jpg"),
   eighteen: getImgPath("slike/paketi/zurka5.jpg"),
   slavlja: getImgPath("slike/paketi/slavlja.jpg")
@@ -43,7 +43,7 @@ const SERVICE_IMAGES: Record<string, string> = {
 
 const GALLERY_IMAGES = [
   getImgPath("slike/galerija/zurka1.jpg"),
-  getImgPath("slike/galerija/rodjenje.jpg"),
+  getImgPath("slike/galerija/zurka5.jpg"),
   getImgPath("slike/galerija/prosotr1.jpg"),
   getImgPath("slike/galerija/pozadina.jpg"),
   getImgPath("slike/galerija/zurka.jpg"),
