@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
-import { dataService } from '../services/dataService';
+import { dataService } from '../services/dataService'; // Proveri putanju (./ ili ../)
 import { Reservation, PackageKey, Comment } from '../types';
 import { PACKAGES, ALL_DAY_SLOTS } from '../constants';
 
@@ -40,12 +39,15 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
     }
   }, [isAuthenticated]);
 
-  const loadReservations = () => {
-    setReservations(dataService.getReservations());
+  // IZMENA: Funkcije za učitavanje su sada async (za Supabase)
+  const loadReservations = async () => {
+    const data = await dataService.getReservations();
+    setReservations(data);
   };
 
-  const loadComments = () => {
-    setComments(dataService.getComments());
+  const loadComments = async () => {
+    const data = await dataService.getComments();
+    setComments(data);
   };
 
   const handleLogin = (e: React.FormEvent) => {
@@ -58,39 +60,41 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
     }
   };
 
-  const handleDelete = (id: string) => {
+  // IZMENA: Delete je sada async
+  const handleDelete = async (id: string | number) => {
     if (window.confirm('Da li ste sigurni da želite da obrišete ovu rezervaciju?')) {
-      dataService.deleteReservation(id); 
-      loadReservations();
+      await dataService.deleteReservation(id); 
+      await loadReservations();
     }
   };
 
-  const handleDeleteComment = (id: string) => {
+  const handleDeleteComment = async (id: string | number) => {
     if (window.confirm('Obrisati ovaj komentar?')) {
-      dataService.deleteComment(id);
-      loadComments();
+      await dataService.deleteComment(id);
+      await loadComments();
     }
   };
 
-  const handleEditComment = (id: string, oldText: string) => {
+  const handleEditComment = async (id: string | number, oldText: string) => {
     const newText = window.prompt('Izmenite komentar:', oldText);
     if (newText !== null) {
-      dataService.updateComment(id, newText);
-      loadComments();
+      await dataService.updateComment(id, newText);
+      await loadComments();
     }
   };
 
-  const handleAddComment = (e: React.FormEvent) => {
+  const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newComment.author && newComment.text) {
-      dataService.saveComment(newComment);
-      loadComments();
+      await dataService.saveComment(newComment);
+      await loadComments();
       setShowCommentModal(false);
       setNewComment({ author: '', text: '', rating: 5 });
     }
   };
 
-  const handleSaveReservation = (e: React.FormEvent) => {
+  // IZMENA: Save podržava "notes" polje i async rad
+  const handleSaveReservation = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingRes?.customer_name || !editingRes?.date || !editingRes?.time_slot) {
       alert('Molimo popunite osnovna polja!');
@@ -108,8 +112,9 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
       return;
     }
     
-    dataService.saveReservation({
+    await dataService.saveReservation({
       ...editingRes,
+      notes: editingRes.notes || '', // Čuvamo opis
       created_at: editingRes.created_at || new Date().toISOString(),
       status: editingRes.status || 'confirmed',
       guest_count: editingRes.guest_count || 30,
@@ -118,22 +123,23 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
       extras: editingRes.extras || { tables: 0, waiterHours: 0, ledKg: 0, photographer: false, decoration: false, catering: false, makeup: false, dj: false }
     } as Omit<Reservation, 'id'>);
     
-    loadReservations(); 
+    await loadReservations(); 
     setShowFormModal(false);
     setEditingRes(null);
   };
 
   const filteredReservations = useMemo(() => {
-    if (!searchQuery) return reservations;
+    if (!reservations || !searchQuery) return reservations || [];
     const q = searchQuery.toLowerCase();
     return reservations.filter(r => 
-      r.customer_name.toLowerCase().includes(q) || 
-      r.customer_phone.includes(q) || 
-      r.date.includes(q)
+      r.customer_name?.toLowerCase().includes(q) || 
+      r.customer_phone?.includes(q) || 
+      r.date?.includes(q)
     );
   }, [reservations, searchQuery]);
 
   const monthStats = useMemo(() => {
+    if (!reservations) return { count: 0, earnings: 0 };
     const currentMonthReservations = reservations.filter(r => {
       const d = new Date(r.date);
       return d.getMonth() === calMonth && d.getFullYear() === calYear;
@@ -155,7 +161,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
     for (let i = 0; i < startDay; i++) cells.push(<div key={`empty-${i}`}></div>);
     for (let d = 1; d <= lastDay.getDate(); d++) {
       const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      const dayReservations = reservations.filter(r => r.date === dateStr);
+      const dayReservations = reservations ? reservations.filter(r => r.date === dateStr) : [];
       const bookedCount = dayReservations.length;
       
       let statusColor = 'bg-green-100 text-green-700 hover:bg-green-200';
@@ -295,7 +301,8 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                                     <span className="text-[#c8a45d]">🕒 {r.time_slot}</span>
                                     <span>📦 {PACKAGES[r.package_type]?.name}</span>
                                     <span>📞 {r.customer_phone}</span>
-                                    {r.notes && <span className="mt-1 text-gray-500 italic lowercase first-letter:uppercase">📝 {r.notes}</span>}
+                                    {/* OVDE SE PRIKAZUJE OPIS U PREGLEDU DANA */}
+                                    {r.notes && <span className="mt-1 text-gray-500 italic lowercase first-letter:uppercase bg-white p-2 rounded border border-gray-50">📝 {r.notes}</span>}
                                     <span className="mt-2 pt-2 border-t border-gray-200 text-[#1f2e2a]">Ukupno: {r.total_price}€</span>
                                   </div>
                               </div>
@@ -494,6 +501,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                      <input type="number" value={editingRes?.total_price || 0} onChange={e => setEditingRes({...editingRes!, total_price: parseInt(e.target.value)})} className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-bold text-[#c8a45d]" />
                   </div>
 
+                  {/* DODATO POLJE ZA OPIS / BELEŠKE */}
                   <div className="md:col-span-2 space-y-2">
                      <label className="text-[10px] font-black uppercase text-gray-400 ml-2">Beleške (Važne informacije o rezervaciji)</label>
                      <textarea 
@@ -501,7 +509,7 @@ const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                         onChange={e => setEditingRes({...editingRes!, notes: e.target.value})} 
                         rows={3}
                         className="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none font-medium resize-none placeholder:text-gray-300"
-                        placeholder="Npr. Dekoracija balona u plavoj boji, torta stiže u 16h..."
+                        placeholder="Npr. Rođendan od male Milice, donose svoju tortu..."
                      />
                   </div>
 
