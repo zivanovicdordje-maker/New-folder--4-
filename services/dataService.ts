@@ -1,50 +1,102 @@
-
+import { createClient } from '@supabase/supabase-js';
 import { Reservation, Comment } from '../types';
 
-const STORAGE_KEY = 'indodjija_reservations';
-const COMMENTS_KEY = 'indodjija_comments';
+// Ovi ključevi se automatski povlače iz GitHub Secrets (za produkciju) ili .env fajla (lokalno)
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export const dataService = {
-  // Rezervacije
-  getReservations: (): Reservation[] => {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
-  },
-  isSlotOccupied: (date: string, timeSlot: string): boolean => {
-    const reservations = dataService.getReservations();
-    return reservations.some(r => r.date === date && r.time_slot === timeSlot && r.status === 'confirmed');
-  },
-  saveReservation: (res: Omit<Reservation, 'id'>) => {
-    const reservations = dataService.getReservations();
-    const newRes = { ...res, id: Math.random().toString(36).substr(2, 9) };
-    reservations.push(newRes as Reservation);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(reservations));
-  },
-  deleteReservation: (id: string) => {
-    const reservations = dataService.getReservations().filter(r => r.id !== id);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(reservations));
+  // --- REZERVACIJE ---
+
+  getReservations: async (): Promise<Reservation[]> => {
+    const { data, error } = await supabase
+      .from('reservations')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('Greška pri čitanju rezervacija:', error);
+      return [];
+    }
+    return data || [];
   },
 
-  // Komentari
-  getComments: (): Comment[] => {
-    const data = localStorage.getItem(COMMENTS_KEY);
-    return data ? JSON.parse(data) : [
-      { id: '1', author: 'Jelena M.', text: 'Prelepo mesto, deca su bila oduševljena igralištem!', rating: 5, date: new Date().toISOString() },
-      { id: '2', author: 'Marko K.', text: 'Odlična organizacija za punoletstvo. Sve preporuke.', rating: 5, date: new Date().toISOString() }
-    ];
+  isSlotOccupied: async (date: string, timeSlot: string): Promise<boolean> => {
+    const { data, error } = await supabase
+      .from('reservations')
+      .select('id')
+      .eq('date', date)
+      .eq('time_slot', timeSlot)
+      .eq('status', 'confirmed');
+    
+    if (error) return false;
+    return data && data.length > 0;
   },
-  saveComment: (comment: Omit<Comment, 'id' | 'date'>) => {
-    const comments = dataService.getComments();
-    const newComment = { ...comment, id: Math.random().toString(36).substr(2, 9), date: new Date().toISOString() };
-    comments.unshift(newComment);
-    localStorage.setItem(COMMENTS_KEY, JSON.stringify(comments));
+
+  saveReservation: async (res: Omit<Reservation, 'id'>) => {
+    const { error } = await supabase
+      .from('reservations')
+      .insert([res]);
+    
+    if (error) throw error;
   },
-  updateComment: (id: string, text: string) => {
-    const comments = dataService.getComments().map(c => c.id === id ? { ...c, text } : c);
-    localStorage.setItem(COMMENTS_KEY, JSON.stringify(comments));
+
+  deleteReservation: async (id: string | number) => {
+    const { error } = await supabase
+      .from('reservations')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
   },
-  deleteComment: (id: string) => {
-    const comments = dataService.getComments().filter(c => c.id !== id);
-    localStorage.setItem(COMMENTS_KEY, JSON.stringify(comments));
+
+  // --- KOMENTARI ---
+
+  getComments: async (): Promise<Comment[]> => {
+    const { data, error } = await supabase
+      .from('comments')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      // Ako baza ne radi, vraćamo tvoje default komentare kao rezervu
+      return [
+        { id: '1', author: 'Jelena M.', text: 'Prelepo mesto, deca su bila oduševljena igralištem!', rating: 5, date: new Date().toISOString() },
+        { id: '2', author: 'Marko K.', text: 'Odlična organizacija za punoletstvo. Sve preporuke.', rating: 5, date: new Date().toISOString() }
+      ];
+    }
+    return data || [];
+  },
+
+  saveComment: async (comment: Omit<Comment, 'id' | 'date'>) => {
+    const newComment = { 
+      ...comment, 
+      date: new Date().toISOString() 
+    };
+    const { error } = await supabase
+      .from('comments')
+      .insert([newComment]);
+    
+    if (error) throw error;
+  },
+
+  updateComment: async (id: string | number, text: string) => {
+    const { error } = await supabase
+      .from('comments')
+      .update({ text })
+      .eq('id', id);
+    
+    if (error) throw error;
+  },
+
+  deleteComment: async (id: string | number) => {
+    const { error } = await supabase
+      .from('comments')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
   }
 };
