@@ -359,13 +359,13 @@ useEffect(() => {
            <div className="max-w-4xl mx-auto px-6 py-32 space-y-16">
               <div className="text-center space-y-4">
                  <h2 className="font-display text-5xl md:text-8xl">Indođija</h2>
-                 <p className="text-[var(--gold)] italic text-xl md:text-2xl tracking-widest font-display">Vaša Oaza Luksuza</p>
+                 <p className="text-[var(--gold)] italic text-xl md:text-2xl tracking-widest font-display">Vaša Oaza mira i zabave</p>
               </div>
               <img src={getImgPath("slike/galerija/prosotr1.jpg")} className="w-full h-[300px] md:h-[500px] object-cover rounded-[40px] md:rounded-[60px] shadow-2xl" alt="Indođija Prozor" />
               
               <div className="grid md:grid-cols-2 gap-10 md:gap-16 text-base md:text-lg leading-relaxed text-white/80 font-light">
                  <p>Smeštena u samom srcu vojvođanske ravnice, Indođija Luxury Event Garden predstavlja krunu inđijske ponude za proslave. Naša misija je jednostavna: stvoriti prostor u kojem se priroda i moderni luksuz prepliću, stvarajući atmosferu koja oduzima dah.</p>
-                 <p>Od intimnih proslava rođenja i krštenja, do spektakularnih punoletstava i korporativnih događaja, naš vrt se prilagođava vašoj viziji. Sa kapacitetom do 200 gostiju na otvorenom, svaka proslava dobija notu ekskluzivnosti.</p>
+                 <p>Od intimnih proslava rođenja i krštenja, do spektakularnih punoletstava i korporativnih događaja, naš vrt se prilagođava vašoj viziji. Sa kapacitetom do 200 gostiju na otvorenom, svaka proslava dobija nezaboravne trenutke koji se pamte.</p>
               </div>
 
               {/* Canva Presentation Preview Section */}
