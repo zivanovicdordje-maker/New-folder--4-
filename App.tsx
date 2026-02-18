@@ -396,9 +396,9 @@ useEffect(() => {
                  <h3 className="font-display text-3xl md:text-4xl text-[var(--gold)] text-center">Šta nas izdvaja?</h3>
                  <div className="grid md:grid-cols-3 gap-6 md:gap-8">
                     {[
-                       { t: 'Ambijent', d: 'Ručno uređeni vrtovi sa hiljadama lampica za magične večeri.' },
+                       { t: 'Ambijent', d: 'U prirodi odvojen od gradske buke i haosa.' },
                        { t: 'Prilagodljivost', d: 'Zatvoreni prostor za hladnije dane sa grejanjem i klimatizacijom.' },
-                       { t: 'Kvalitet', d: 'Saradnja sa najboljim kuvarima, fotografima i dekoraterima u regionu.' }
+                       { t: 'Kvalitet', d: 'Saradnja sa najboljim kuvarima, fotografima,dekoraterima, dj-evima u Inđiji.' }
                     ].map(f => (
                        <div key={f.t} className="p-6 md:p-8 bg-white/5 border border-white/10 rounded-3xl text-center space-y-4">
                           <div className="text-xl md:text-2xl font-display text-[var(--gold)]">{f.t}</div>
