@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => {
       // OBAVEZNO: Ovo mora da se poklapa sa imenom tvog GitHub repozitorijuma!
       // Ako ti je repo "Indodjija1", stavi '/Indodjija1/'
       // Ako je "New-folder--4-", ostavi ovako:
-      base: '/New-folder--4-/', 
+      base: '/Indodjija023/', 
       
       server: {
         port: 3000,
