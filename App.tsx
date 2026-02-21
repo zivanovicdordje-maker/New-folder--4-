@@ -26,7 +26,7 @@ const PKG_IMAGES: Record<PackageKey, string> = {
   teen: getImgPath("slike/paketi/torta za 18. rodjendan.jpg"),
   adult: getImgPath("slike/paketi/Slavljenje 18. rodjendana Indjija.jpg"),
   baby: getImgPath("slike/galerija/rodjenje2.JPG"),
-  gender: getImgPath("slike/paketi/gender reweal.jpg"),
+  gender: getImgPath("slike/paketi/gender reweal.png"),
   eighteen: getImgPath("slike/paketi/indodjija na otvorenom.jpg"),
   slavlja: getImgPath("slike/paketi/organizovano slavlje po zelji.jpg")
 };
@@ -849,7 +849,7 @@ useEffect(() => {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-24 mb-24 md:mb-32 text-center md:text-left">
             <div className="space-y-8 md:space-y-10 flex flex-col items-center md:items-start">
                <div className="w-20 h-20 md:w-24 md:h-24 border border-white/10 rounded-full overflow-hidden grayscale hover:grayscale-0 transition-all duration-700 mb-4 md:mb-6 bg-[var(--dark-green)] flex items-center justify-center">
-                 <img src={getImgPath("slike/galerija/logo indodjije.png)} alt="Indođija Logo" className="w-full h-full object-cover" />
+                 <img src={getImgPath("slike/galerija/logo indodjije.png")} alt="Indođija Logo" className="w-full h-full object-cover" />
                </div>
                <p className="text-white/30 text-[9px] md:text-[11px] leading-loose uppercase tracking-[2px] md:tracking-[3px]">Inđijski premium event vrt. Vaše uspomene zaslužuju luksuz koji pruža Indođija.</p>
             </div>
