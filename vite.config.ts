@@ -8,13 +8,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default defineConfig(({ mode }) => {
-    // Učitava env varijable
+    // Učitava env varijable, ali na bezbedan način
     const env = loadEnv(mode, process.cwd(), '');
     
     return {
-      // OBAVEZNO: Ovo mora da se poklapa sa imenom tvog GitHub repozitorijuma!
-      // Ako ti je repo "Indodjija1", stavi '/Indodjija1/'
-      // Ako je "New-folder--4-", ostavi ovako:
+      // OSTAVLJENO ISTO: Tvoja putanja
       base: '/', 
       
       server: {
@@ -33,9 +31,13 @@ export default defineConfig(({ mode }) => {
         sourcemap: false,
         minify: 'esbuild',
       },
-      // Ovo omogućava da kod pristupi sistemskim varijablama na GitHub Actions
+      // ISPRAVLJENO: Sada prosleđujemo samo neophodno, 
+      // umesto celog process.env objekta koji je bio rizičan.
       define: {
-        'process.env': env
+        'process.env.NODE_ENV': JSON.stringify(mode),
+        // Ako tvoj kod koristi specifične varijable iz .env fajla, 
+        // ovde dodajemo prazan objekat da se build ne bi srušio
+        'process.env': {} 
       }
     };
 });
