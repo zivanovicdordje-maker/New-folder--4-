@@ -44,7 +44,7 @@ const SERVICE_IMAGES: Record<string, string> = {
 const GALLERY_IMAGES = [
   getImgPath("slike/galerija/Prostor za zurke Indjija Indodjija.jpg"),
   getImgPath("slike/galerija/indodjija na otvorenom.jpg"),
-  getImgPath("slike/galerija/prostor Indodjije.jpg"),
+  getImgPath("slike/galerija/rodjenje2.JPG"),
   getImgPath("slike/galerija/pozadina za indodjiju.jpg"),
   getImgPath("slike/galerija/zurka na vikendici Indjija.jpg"),
   getImgPath("slike/galerija/torta za 18. rodjendan.jpg")
@@ -449,7 +449,7 @@ useEffect(() => {
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3 cursor-pointer group" onClick={() => scrollTo('hero')}>
             <div className="w-10 h-10 border border-[var(--gold)] rounded-full overflow-hidden transition-all group-hover:scale-110 bg-[var(--dark-green)]">
-               <img src={getImgPath("slike/galerija/logo indodjije.jpg")} alt="Indođija Logo" className="w-full h-full object-cover" />
+               <img src={getImgPath("slike/galerija/logo indodjije.png")} alt="Indođija Logo" className="w-full h-full object-cover" />
             </div>
             <span className="font-display text-white text-lg md:text-xl tracking-[2px] font-bold">INDOĐIJA</span>
           </div>
