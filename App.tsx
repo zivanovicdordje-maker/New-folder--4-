@@ -361,7 +361,7 @@ useEffect(() => {
                  <h2 className="font-display text-5xl md:text-8xl">Indođija</h2>
                  <p className="text-[var(--gold)] italic text-xl md:text-2xl tracking-widest font-display">Vaša Oaza mira i zabave</p>
               </div>
-              <img src={getImgPath("slike/galerija/prosotr1.jpg")} className="w-full h-[300px] md:h-[500px] object-cover rounded-[40px] md:rounded-[60px] shadow-2xl" alt="Indođija Prozor" />
+              <img src={getImgPath("slike/galerija/prosotor Indodjije.jpg")} className="w-full h-[300px] md:h-[500px] object-cover rounded-[40px] md:rounded-[60px] shadow-2xl" alt="Indođija Prozor" />
               
               <div className="grid md:grid-cols-2 gap-10 md:gap-16 text-base md:text-lg leading-relaxed text-white/80 font-light">
                 <p>Smeštena u srcu vojvođanske ravnice, nadomak Inđije, Indođija Event Garden je mesto za proslave u prirodi, izdvojeno od gradske buke i užurbanog ritma. Okruženi zelenilom i mirom, stvaramo prijatan ambijent u kome se gosti osećaju opušteno i dobrodošlo.</p>
@@ -449,7 +449,7 @@ useEffect(() => {
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3 cursor-pointer group" onClick={() => scrollTo('hero')}>
             <div className="w-10 h-10 border border-[var(--gold)] rounded-full overflow-hidden transition-all group-hover:scale-110 bg-[var(--dark-green)]">
-               <img src={getImgPath("slike/galerija/logo.jpg")} alt="Indođija Logo" className="w-full h-full object-cover" />
+               <img src={getImgPath("slike/galerija/logo indodjije.jpg")} alt="Indođija Logo" className="w-full h-full object-cover" />
             </div>
             <span className="font-display text-white text-lg md:text-xl tracking-[2px] font-bold">INDOĐIJA</span>
           </div>
@@ -496,7 +496,7 @@ useEffect(() => {
       <section id="hero" className="relative h-screen flex items-center justify-center bg-[var(--dark-green)]">
         <div 
           className="absolute inset-0 opacity-40 bg-cover bg-center grayscale scale-105"
-          style={{ backgroundImage: `url(${getImgPath('slike/galerija/pozadina.jpg')})` }}
+          style={{ backgroundImage: `url(${getImgPath('slike/galerija/pozadina za indodjiju.jpg')})` }}
         ></div>
         <div className="relative z-10 text-center px-6">
            <h1 className="font-display text-6xl md:text-9xl text-white mb-6 drop-shadow-2xl animate-fade-up uppercase tracking-tighter text-shadow-xl">INDOĐIJA</h1>
