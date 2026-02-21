@@ -32,29 +32,29 @@ const PKG_IMAGES: Record<PackageKey, string> = {
 };
 
 const SERVICE_IMAGES: Record<string, string> = {
-  photographer: getImgPath("slike/galerija/foto.jpg"),
-  decoration: getImgPath("slike/galerija/dekoracija.jpg"),
-  catering: getImgPath("slike/galerija/ketering.jpg"),
-  makeup: getImgPath("slike/galerija/sminka.jpg"),
-  dj: getImgPath("slike/galerija/dj.jpg"),
-  waiter: getImgPath("slike/galerija/konobar.jpg"),
-  tables: getImgPath("slike/galerija/stolovi.jpg")
+  photographer: getImgPath("slike/galerija/Fotograf za slavlja.jpg"),
+  decoration: getImgPath("slike/galerija/dekoracija za slavlja.jpg"),
+  catering: getImgPath("slike/galerija/ketering za proslave.jpg"),
+  makeup: getImgPath("slike/galerija/sminkanje male dece Indjija.jpg"),
+  dj: getImgPath("slike/galerija/Dj pusta muziku.jpg"),
+  waiter: getImgPath("slike/galerija/konobar za proslave.jpg"),
+  tables: getImgPath("slike/galerija/barski stolovi Indjija.jpg")
 };
 
 const GALLERY_IMAGES = [
-  getImgPath("slike/galerija/zurka1.jpg"),
-  getImgPath("slike/galerija/zurka5.jpg"),
-  getImgPath("slike/galerija/prosotr1.jpg"),
-  getImgPath("slike/galerija/pozadina.jpg"),
-  getImgPath("slike/galerija/zurka.jpg"),
-  getImgPath("slike/galerija/zurka6.jpg")
+  getImgPath("slike/galerija/Prostor za zurke Indjija Indodjija.jpg"),
+  getImgPath("slike/galerija/indodjija na otvorenom.jpg"),
+  getImgPath("slike/galerija/prostor Indodjije.jpg"),
+  getImgPath("slike/galerija/pozadina za indodjiju.jpg"),
+  getImgPath("slike/galerija/zurka na vikendici Indjija.jpg"),
+  getImgPath("slike/galerija/torta za 18. rodjendan.jpg")
 ];
 
 const HOLIDAYS = [
-  { name: 'Nova Godina', img: getImgPath('slike/galerija/vatromet.jpg'), icon: '🎄' },
-  { name: 'Repriza Nove Godine', img: getImgPath('slike/galerija/sampanjac.jpg'), icon: '🎆' },
-  { name: 'Srpska Nova Godina', img: getImgPath('slike/galerija/prskalica.jpg'), icon: '🇷🇸' },
-  { name: '1. Maj', img: getImgPath('slike/galerija/1maj.jpg'), icon: '🌱' }
+  { name: 'Nova Godina', img: getImgPath('slike/galerija/vatromet indjija.jpg'), icon: '🎄' },
+  { name: 'Repriza Nove Godine', img: getImgPath('slike/galerija/sampanjac Indjija.jpg'), icon: '🎆' },
+  { name: 'Srpska Nova Godina', img: getImgPath('slike/galerija/prskalice u Indodjiji.jpg'), icon: '🇷🇸' },
+  { name: '1. Maj', img: getImgPath('slike/galerija/Proslava 1. maja.jpg'), icon: '🌱' }
 ];
 
 const CANVA_PRESENTATION_URL = "https://www.canva.com/design/DAGty2-d1Ik/kEB1xHTzGHi0krgT0lC6tg/view?utm_content=DAGty2-d1Ik&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=ha42092f073";
