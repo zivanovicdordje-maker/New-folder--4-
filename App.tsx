@@ -376,7 +376,7 @@ useEffect(() => {
                     <p className="text-white/60 text-sm md:text-base max-w-xl mx-auto">Pogledajte našu kompletnu digitalnu prezentaciju sa svim detaljima, paketima i dodatnim opcijama.</p>
                  </div>
                  <div className="relative group max-w-2xl mx-auto overflow-hidden rounded-3xl aspect-video bg-black/20 flex items-center justify-center border border-white/5">
-                    <img src={getImgPath("slike/galerija/pozadina.jpg")} className="absolute inset-0 w-full h-full object-cover opacity-30 blur-sm group-hover:scale-110 transition-transform duration-700" alt="Preview" />
+                    <img src={getImgPath("slike/galerija/pozadina za indodjiju.jpg")} className="absolute inset-0 w-full h-full object-cover opacity-30 blur-sm group-hover:scale-110 transition-transform duration-700" alt="Preview" />
                     <div className="relative z-10 flex flex-col items-center gap-6">
                        <div className="w-20 h-20 bg-[var(--gold)] rounded-full flex items-center justify-center shadow-2xl animate-pulse">
                           <svg width="40" height="40" fill="currentColor" viewBox="0 0 24 24" className="text-[var(--dark-green)]"><path d="M8 5v14l11-7z"/></svg>
@@ -545,14 +545,14 @@ useEffect(() => {
                        <p className="text-gray-500 text-xs md:text-sm leading-relaxed font-medium">Od sada u Indođiji rezervisati <strong>vožnju kvadom</strong>! Priuštite mališanima nezaboravnu avanturu u bezbednom okruženju uz stručan nadzor.</p>
                     </div>
                     <div className="w-full md:w-[200px] lg:w-[240px] aspect-square rounded-[30px] md:rounded-[40px] overflow-hidden shadow-2xl transition-transform hover:scale-105 duration-500 border-4 border-white">
-                       <img src={getImgPath("slike/galerija/kvad.jpg")} alt="Deciji Kvad" className="w-full h-full object-cover" />
+                       <img src={getImgPath("slike/galerija/iznajmljivanje kvada.jpg")} alt="Deciji Kvad" className="w-full h-full object-cover" />
                     </div>
                  </div>
               </div>
            </div>
            <div className="flex-1 relative w-full">
               <div className="w-full h-[400px] md:h-[650px] rounded-[60px] md:rounded-[120px] overflow-hidden shadow-2xl z-10 lg:rotate-[2deg] border-[8px] md:border-[12px] border-white">
-                 <img src={getImgPath("slike/galerija/slavlja.jpg")} className="w-full h-full object-cover" alt="Garden" />
+                 <img src={getImgPath("slike/galerija/organizovano slavlje po zelji.jpg")} className="w-full h-full object-cover" alt="Garden" />
               </div>
               <div className="absolute -bottom-8 -left-8 md:-bottom-16 md:-left-16 w-40 md:w-80 h-40 md:h-80 bg-[var(--gold)]/30 rounded-full blur-[60px] md:blur-[120px] z-0"></div>
            </div>
@@ -849,7 +849,7 @@ useEffect(() => {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-24 mb-24 md:mb-32 text-center md:text-left">
             <div className="space-y-8 md:space-y-10 flex flex-col items-center md:items-start">
                <div className="w-20 h-20 md:w-24 md:h-24 border border-white/10 rounded-full overflow-hidden grayscale hover:grayscale-0 transition-all duration-700 mb-4 md:mb-6 bg-[var(--dark-green)] flex items-center justify-center">
-                 <img src={getImgPath("slike/galerija/logo.jpg")} alt="Indođija Logo" className="w-full h-full object-cover" />
+                 <img src={getImgPath("slike/galerija/logo indodjije.png)} alt="Indođija Logo" className="w-full h-full object-cover" />
                </div>
                <p className="text-white/30 text-[9px] md:text-[11px] leading-loose uppercase tracking-[2px] md:tracking-[3px]">Inđijski premium event vrt. Vaše uspomene zaslužuju luksuz koji pruža Indođija.</p>
             </div>
