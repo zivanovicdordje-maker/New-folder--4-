@@ -22,13 +22,13 @@ const getImgPath = (path: string) => {
 };
 
 const PKG_IMAGES: Record<PackageKey, string> = {
-  kids: getImgPath("slike/paketi/deca.jpg"),
-  teen: getImgPath("slike/paketi/zurka6.jpg"),
-  adult: getImgPath("slike/paketi/zurka2.jpg"),
+  kids: getImgPath("slike/paketi/deciji rodjendani.jpg"),
+  teen: getImgPath("slike/paketi/torta za 18. rodjendan.jpg"),
+  adult: getImgPath("slike/paketi/Slavljenje 18. rodjendana Indjija.jpg"),
   baby: getImgPath("slike/galerija/rodjenje2.JPG"),
-  gender: getImgPath("slike/paketi/gender.jpg"),
-  eighteen: getImgPath("slike/paketi/zurka5.jpg"),
-  slavlja: getImgPath("slike/paketi/slavlja.jpg")
+  gender: getImgPath("slike/paketi/gender reweal.jpg"),
+  eighteen: getImgPath("slike/paketi/indodjija na otvorenom.jpg"),
+  slavlja: getImgPath("slike/paketi/organizovano slavlje po zelji.jpg")
 };
 
 const SERVICE_IMAGES: Record<string, string> = {
