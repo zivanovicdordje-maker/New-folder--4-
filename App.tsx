@@ -364,8 +364,9 @@ useEffect(() => {
               <img src={getImgPath("slike/galerija/prosotr1.jpg")} className="w-full h-[300px] md:h-[500px] object-cover rounded-[40px] md:rounded-[60px] shadow-2xl" alt="Indođija Prozor" />
               
               <div className="grid md:grid-cols-2 gap-10 md:gap-16 text-base md:text-lg leading-relaxed text-white/80 font-light">
-                 <p>Smeštena u samom srcu vojvođanske ravnice, Indođija Luxury Event Garden predstavlja krunu inđijske ponude za proslave. Naša misija je jednostavna: stvoriti prostor u kojem se priroda i moderni luksuz prepliću, stvarajući atmosferu koja oduzima dah.</p>
-                 <p>Od intimnih proslava rođenja i krštenja, do spektakularnih punoletstava i korporativnih događaja, naš vrt se prilagođava vašoj viziji. Sa kapacitetom do 200 gostiju na otvorenom, svaka proslava dobija nezaboravne trenutke koji se pamte.</p>
+                <p>Smeštena u srcu vojvođanske ravnice, nadomak Inđije, Indođija Event Garden je mesto za proslave u prirodi, izdvojeno od gradske buke i užurbanog ritma. Okruženi zelenilom i mirom, stvaramo prijatan ambijent u kome se gosti osećaju opušteno i dobrodošlo.</p>
+
+<p>Bilo da organizujete rođendan, krštenje, punoletstvo, venčanje ili privatni događaj u Inđiji, naš prostor se prilagođava vašim željama. Sa kapacitetom do 200 gostiju na otvorenom, Indođija je idealan izbor za sve koji traže prirodan i prijatan prostor za proslave u okolini Inđije, gde svaki događaj dobija posebnu atmosferu.</p>
               </div>
 
               {/* Canva Presentation Preview Section */}
