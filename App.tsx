@@ -496,7 +496,7 @@ useEffect(() => {
       <section id="hero" className="relative h-screen flex items-center justify-center bg-[var(--dark-green)]">
         <div 
           className="absolute inset-0 opacity-40 bg-cover bg-center grayscale scale-105"
-          style={{ backgroundImage: `url(${getImgPath('slike/galerija/pozadina za indodjiju.jpg')})` }}
+          style={{ backgroundImage: `url(${getImgPath('public/slike/galerija/pozadina za indodjiju.jpg')})` }}
         ></div>
         <div className="relative z-10 text-center px-6">
            <h1 className="font-display text-6xl md:text-9xl text-white mb-6 drop-shadow-2xl animate-fade-up uppercase tracking-tighter text-shadow-xl">INDOĐIJA</h1>
