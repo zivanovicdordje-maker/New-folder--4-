@@ -494,13 +494,15 @@ useEffect(() => {
       )}
 
       <section id="hero" className="relative h-screen flex items-center justify-center bg-[var(--dark-green)]">
-        <div 
-          className="absolute inset-0 opacity-40 bg-cover bg-center grayscale scale-105"
-          style={{ backgroundImage: `url(${getImgPath('public/slike/galerija/pozadina za indodjiju.jpg')})` }}
-        ></div>
+     <div 
+  className="absolute inset-0 opacity-40 bg-cover bg-center grayscale scale-105"
+  style={{ 
+    backgroundImage: `url("${getImgPath('slike/galerija/pozadina-za-indodjiju.jpg')}")` 
+  }}
+></div>
         <div className="relative z-10 text-center px-6">
            <h1 className="font-display text-6xl md:text-9xl text-white mb-6 drop-shadow-2xl animate-fade-up uppercase tracking-tighter text-shadow-xl">INDOĐIJA</h1>
-           <p className="font-display italic text-xl md:text-3xl text-[var(--gold)] mb-12 animate-fade-up delay-100">Gde luksuz susreće prirodu.</p>
+           <p className="font-display italic text-xl md:text-3xl text-[var(--gold)] mb-12 animate-fade-up delay-100">Gde dobra energija susreću prirodu.</p>
            <button onClick={() => scrollTo('booking-section')} className="px-10 py-5 md:px-14 md:py-6 bg-[var(--gold)] text-[var(--dark-green)] font-black uppercase text-[10px] md:text-[11px] tracking-[4px] hover:bg-white transition-all shadow-2xl rounded-sm">Rezervišite termin</button>
         </div>
       </section>
