@@ -45,7 +45,7 @@ const GALLERY_IMAGES = [
   getImgPath("slike/galerija/Prostor za zurke Indjija Indodjija.jpg"),
   getImgPath("slike/galerija/indodjija na otvorenom.jpg"),
   getImgPath("slike/galerija/rodjenje2.JPG"),
-  getImgPath("slike/galerija/pozadina za indodjiju.jpg"),
+  getImgPath("slike/galerija/pozadina-za-indodjiju.jpg"),
   getImgPath("slike/galerija/zurka na vikendici Indjija.jpg"),
   getImgPath("slike/galerija/torta za 18. rodjendan.jpg")
 ];
