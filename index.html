@@ -1,20 +1,24 @@
 <!DOCTYPE html>
 <html lang="sr" class="h-full">
 <head>
-  <link rel="icon" href="/public/slike/galerija/logo indodjije.png" type="image/png">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- IKONICA SAJTA (Favicon) - Vite vuče direktno iz public foldera -->
+    <link rel="icon" href="/slike/galerija/logo indodjije.png" type="image/png">
+    
+    <!-- SEO METADATA -->
+    <title>Indodjija Luxury Event Garden | Mesto za proslave Inđija</title>
+    <meta name="description" content="Indodjija je prostor za proslave svih tipova u prirodi, izdvojen od gradske buke Inđije. Idealno za rođendane, venčanja, privatne i poslovne događaje.">
     <meta name="google-site-verification" content="01zM2MOlYDuVcIFak7A01KTTpZwsnS2z14WZYz1TsxE" />
-    <title>Indodjija Luxury Event Garden</title>
-<meta name="description" content="Indodjija je prostor za proslave svih tipova u prirodi, izdvojen od gradske buke Inđije. Idealno za rođendane, venčanja, privatne i poslovne događaje.">
-    <h1>Mesto za proslave u prirodi kod Inđije</h1>
-    <!-- Tailwind CSS -->
+
+    <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts - Zadržani tvoji fontovi -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     
-    <!-- PayPal SDK - Zadržan tvoj ID -->
+    <!-- PayPal SDK -->
     <script src="https://www.paypal.com/sdk/js?client-id=BAAduCqSQY22LnkY_KBfvUgj4b_Wq9R04GgDwAyMONOR3SdjjpJCVHMenPXanLtgIdPFKTrBmxFVKpuc4Y&components=hosted-buttons&disable-funding=venmo&currency=EUR"></script>
     
     <style>
@@ -37,12 +41,20 @@
         }
         .font-display { font-family: 'Playfair Display', serif; }
         
-        /* Bela slova bez ivica za meni */
-        .menu-item-outline {
-            color: white;
-            text-shadow: none;
+        /* KLASA ZA SAKRIVANJE NASLOVA OD LJUDI (SEO friendly) */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
         }
 
+        .menu-item-outline { color: white; text-shadow: none; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--dark-green); }
         ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
@@ -52,29 +64,26 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-up { animation: fade-up 0.6s ease-out forwards; }
-
         .gallery-scroll::-webkit-scrollbar { height: 4px; }
         .gallery-scroll::-webkit-scrollbar-thumb { background: var(--gold); }
     </style>
-
-    <!-- UKLONJEN IMPORTMAP: On pravi konflikt sa Vite-om na GitHub-u -->
-    <!-- UKLONJEN LINK ZA CSS: Vite će sam ubaciti CSS iz tvog index.tsx fajla -->
 </head>
 <body class="h-full">
-   <div id="root">
-  <!-- Ovo će se videti samo dok se sajt učitava -->
-  <div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; background-color: #f8f9fa;">
-    <div style="text-align: center;">
-      <h2 style="color: #333;">Indodjija Luxury Garden</h2>
-      <p style="color: #777;">Učitavanje oaze mira...</p>
-    </div>
-  </div>
-</div>
 
-    <!-- REŠENJE ZA SCRIPT GRESKE: -->
-    <!-- Na GitHub Pages, putanja mora biti relativna da bi Vite mogao da je "uhvati" -->
-    <!-- Ako ti je index.tsx u folderu 'src', koristi: src="/src/index.tsx" -->
-    <!-- Ako ti je index.tsx u istom folderu gde i ovaj html, koristi: src="/index.tsx" -->
+    <!-- SEO NASLOV: Google ga vidi, ali posetioci NE jer koristi klasu sr-only -->
+    <h1 class="sr-only">Indođija Luxury Garden - Mesto za proslave u prirodi kod Inđije. Idealno za rođendane, venčanja i korporativne proslave.</h1>
+
+    <div id="root">
+        <!-- Učitavanje (vidi se samo par sekundi dok se React ne podigne) -->
+        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; background-color: #f8f9fa;">
+            <div style="text-align: center;">
+                <h2 style="color: #333; font-weight: bold;">Indodjija Luxury Garden</h2>
+                <p style="color: #777;">Učitavanje oaze mira...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Glavna skripta -->
     <script type="module" src="/index.tsx"></script>
 </body>
 </html>
