@@ -88,9 +88,17 @@ const App: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string | null>(null);
   const [isWaiterEnabled, setIsWaiterEnabled] = useState(false);
-  const [extras, setExtras] = useState<ExtraServices>({ 
-    tables: 0, waiterHours: 0, ledKg: 0, photographer: false, decoration: false, catering: false, makeup: false, dj: false
-  });
+ const [extras, setExtras] = useState({ 
+  tables: 0, 
+  waiterCount: 0, // NOVO: Broj konobara
+  waiterHours: 0, 
+  ledKg: 0, 
+  photographer: false, 
+  decoration: false, 
+  catering: false, 
+  makeup: false, 
+  dj: false 
+});
   const [calMonth, setCalMonth] = useState(new Date().getMonth());
   const [calYear, setCalYear] = useState(new Date().getFullYear());
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -126,8 +134,9 @@ useEffect(() => {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    if (!isWaiterEnabled || activePackage === 'slavlja') {
+useEffect(() => {
+    // MENJAMO: umesto isWaiterEnabled gledamo extras.waiterCount
+    if (extras.waiterCount === 0 || activePackage === 'slavlja') {
       setExtras(prev => ({ ...prev, waiterHours: 0 }));
       return;
     }
@@ -142,7 +151,8 @@ useEffect(() => {
     }
 
     setExtras(prev => ({ ...prev, waiterHours: duration }));
-  }, [activePackage, selectedTimeSlot, isWaiterEnabled, teenDuration]);
+    // MENJAMO: u zavisnosti (dependency array) stavljamo extras.waiterCount
+  }, [activePackage, selectedTimeSlot, extras.waiterCount, teenDuration]);
 
   useEffect(() => {
     if (selectedSpace === 'closed') {
@@ -193,10 +203,10 @@ useEffect(() => {
       base += 70;
     }
     
-    const extrasTotal = 
-      (extras.tables * 10) + 
-      (extras.waiterHours * 10) + 
-      (extras.ledKg * 0.8);
+const extrasTotal = 
+  (extras.tables * 10) + 
+  (extras.waiterCount * extras.waiterHours * 10) + // Množimo: broj konobara * sati * 10€
+  (extras.ledKg * 0.8);
       
     return base + extrasTotal;
   };
@@ -694,14 +704,12 @@ useEffect(() => {
                  <div className="flex-grow">
                     <h3 className="text-[11px] md:text-[12px] font-black uppercase tracking-[3px] md:tracking-[4px] text-[var(--gold)] mb-8 md:mb-10">05 DODATNE USLUGE</h3>
                     <div className="grid grid-cols-2 lg:grid-cols-1 gap-3 md:gap-5 max-h-[500px] lg:max-h-[480px] overflow-y-auto pr-2 gallery-scroll">
-                      {[
+                      {[                
                         { id: 'photographer', label: 'Fotograf', desc: 'Na Upit', icon: '📸' },
                         { id: 'decoration', label: 'Dekoracije', desc: 'Na Upit', icon: '✨' },
                         { id: 'catering', label: 'Ketering', desc: 'Na Upit', icon: '🍽️' },
                         { id: 'makeup', label: 'Šminka', desc: 'Na Upit', icon: '💄' },
-                        { id: 'dj', label: 'DJ Paket', desc: 'Na Upit', icon: '🎵' },
-                        { id: 'waiter', label: 'Konobar', desc: '10€/h', icon: '🤵' },
-                        { id: 'tables', label: 'Barski Stolovi', desc: 'Crni/Beli', icon: '🍷' }
+                        { id: 'dj', label: 'DJ Paket', desc: 'Na Upit', icon: '🎵' }
                       ].map(item => (
                         <label key={item.id} className="flex flex-col lg:flex-row items-center p-4 lg:p-5 bg-white rounded-2xl lg:rounded-3xl shadow-sm cursor-pointer border-2 border-transparent hover:border-[var(--gold)]/40 transition-all text-center lg:text-left group relative">
                           <input 
@@ -727,26 +735,39 @@ useEffect(() => {
                           </div>
                         </label>
                       ))}
-                      {!isSlavlja && (
+                     {!isSlavlja && (
                         <div className="col-span-2 lg:col-span-1 space-y-4 pt-4 border-t border-gray-200">
-                          {extras.tables > 0 && (
-                             <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
-                               <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">Broj stolova (10€/kom)</div>
-                               <div className="flex items-center gap-4">
-                                   <button onClick={() => setExtras({...extras, tables: Math.max(0, extras.tables-1)})} className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center font-black hover:bg-gray-100">-</button>
-                                   <span className="text-xs font-black w-8 text-center">{extras.tables}</span>
-                                   <button onClick={() => setExtras({...extras, tables: extras.tables+1})} className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center font-black hover:bg-gray-100">+</button>
-                               </div>
+                          
+                          {/* KONOBARI */}
+                          <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                             <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">Konobar (10€/h po osobi)</div>
+                             <div className="flex items-center gap-4">
+                                 <button type="button" onClick={() => setExtras({...extras, waiterCount: Math.max(0, extras.waiterCount-1)})} className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center font-black hover:bg-gray-100">-</button>
+                                 <span className="text-xs font-black w-8 text-center">{extras.waiterCount}</span>
+                                 <button type="button" onClick={() => setExtras({...extras, waiterCount: extras.waiterCount+1})} className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center font-black hover:bg-gray-100">+</button>
                              </div>
-                          )}
+                          </div>
+
+                          {/* BARIJSKI STOLOVI */}
+                          <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                             <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">Barski Stolovi (10€/kom)</div>
+                             <div className="flex items-center gap-4">
+                                 <button type="button" onClick={() => setExtras({...extras, tables: Math.max(0, extras.tables-1)})} className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center font-black hover:bg-gray-100">-</button>
+                                 <span className="text-xs font-black w-8 text-center">{extras.tables}</span>
+                                 <button type="button" onClick={() => setExtras({...extras, tables: extras.tables+1})} className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center font-black hover:bg-gray-100">+</button>
+                             </div>
+                          </div>
+
+                          {/* LED PIĆE */}
                           <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
                             <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">LED piće (0.8€/kg)</div>
                             <div className="flex items-center gap-4">
-                                <button onClick={() => setExtras({...extras, ledKg: Math.max(0, extras.ledKg-5)})} className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center font-black hover:bg-gray-100">-</button>
+                                <button type="button" onClick={() => setExtras({...extras, ledKg: Math.max(0, extras.ledKg-5)})} className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center font-black hover:bg-gray-100">-</button>
                                 <span className="text-xs font-black w-8 text-center">{extras.ledKg}kg</span>
-                                <button onClick={() => setExtras({...extras, ledKg: extras.ledKg+5})} className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center font-black hover:bg-gray-100">+</button>
+                                <button type="button" onClick={() => setExtras({...extras, ledKg: extras.ledKg+5})} className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center font-black hover:bg-gray-100">+</button>
                             </div>
                           </div>
+
                         </div>
                       )}
                     </div>
