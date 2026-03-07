@@ -874,7 +874,7 @@ const extrasTotal =
                <div className="w-20 h-20 md:w-24 md:h-24 border border-white/10 rounded-full overflow-hidden grayscale hover:grayscale-0 transition-all duration-700 mb-4 md:mb-6 bg-[var(--dark-green)] flex items-center justify-center">
                  <img src={getImgPath("slike/galerija/logo indodjije.png")} alt="Indođija Logo" className="w-full h-full object-cover" />
                </div>
-               <p className="text-white/30 text-[9px] md:text-[11px] leading-loose uppercase tracking-[2px] md:tracking-[3px]">Inđijski premium event vrt. Vaše uspomene zaslužuju luksuz koji pruža Indođija.</p>
+               <p className="text-white/30 text-[9px] md:text-[11px] leading-loose uppercase tracking-[2px] md:tracking-[3px]">Inđijski premium event vrt. Vaše uspomene zaslužuju ljubav koju pruža Indođija.</p>
             </div>
             <div className="space-y-8 md:space-y-10">
                <h4 className="text-[var(--gold)] font-black uppercase tracking-[4px] md:tracking-[5px] text-[10px] md:text-xs">Kontakt</h4>
