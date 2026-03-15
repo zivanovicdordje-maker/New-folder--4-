@@ -538,60 +538,67 @@ const extrasTotal =
         </div>
       </section>
 
-      {/* 2. O NAMA / SAZNAJTE VIŠE */}
-      <section id="onama" className="py-24 px-6 md:px-12 bg-white overflow-hidden">
-        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16 md:gap-24">
-           <div className="flex-1 space-y-10 md:space-y-12">
-              <h2 className="font-display text-5xl md:text-7xl text-[var(--dark-green)] leading-tight text-center lg:text-left">Vrt Iz Snova <br/> <span className="text-[var(--gold)] italic tracking-[3px] md:tracking-[4px]">U Srcu Ravnice</span></h2>
-              <div className="w-20 md:w-24 h-px bg-[var(--gold)] mx-auto lg:mx-0"></div>
-              <p className="text-gray-600 leading-[1.8] md:leading-[2.2] tracking-[1px] md:tracking-[2px] text-base md:text-lg text-center lg:text-left">Indođija Luxury Event Garden je unikatno mesto za vaše najbitnije proslave. Spoj netaknute prirode i vrhunskog luksuza pruža nezaboravno iskustvo vama i vašim gostima.</p>
-              <div className="text-center lg:text-left">
-                <button onClick={() => setIsAboutDetailsOpen(true)} className="px-10 py-4 md:px-14 md:py-5 border-2 border-[var(--gold)] text-[var(--gold)] uppercase font-black tracking-[4px] md:tracking-[5px] text-[10px] md:text-[12px] hover:bg-[var(--gold)] hover:text-white transition-all rounded-[4px]">Saznajte Više</button>
-              </div>
-              
-              <div className="mt-16 p-8 md:p-10 bg-white rounded-[40px] md:rounded-[50px] shadow-xl border border-gray-100 animate-fade-up relative overflow-hidden group">
-                 <div className="absolute top-0 right-0 bg-[var(--gold)] text-[var(--dark-green)] px-6 md:px-8 py-2 font-black uppercase text-[8px] md:text-[9px] tracking-widest rounded-bl-3xl">Novo u ponudi</div>
-                 <div className="flex flex-col md:flex-row gap-8 md:gap-10 items-center">
-                    <div className="flex-1 space-y-4 md:space-y-6 text-left">
-                       <h3 className="font-display text-2xl md:text-3xl text-[var(--dark-green)]">Adrenalinska Zabava</h3>
-                       <p className="text-gray-500 text-xs md:text-sm leading-relaxed font-medium">Od sada u Indođiji rezervisati <strong>vožnju kvadom</strong>! Priuštite mališanima nezaboravnu avanturu u bezbednom okruženju uz stručan nadzor.</p>
-                    </div>
-                    <div className="w-full md:w-[200px] lg:w-[240px] aspect-square rounded-[30px] md:rounded-[40px] overflow-hidden shadow-2xl transition-transform hover:scale-105 duration-500 border-4 border-white">
-                       <img src={getImgPath("slike/galerija/iznajmljivanje kvada.jpg")} alt="Deciji Kvad" className="w-full h-full object-cover" />
-                    </div>
-                 </div>
-              </div>
-           </div>
-          {/* KARTICA ZA ZIPLINE SA VIDEOM */}
-              <div className="mt-8 p-8 md:p-10 bg-white rounded-[40px] md:rounded-[50px] shadow-xl border border-gray-100 animate-fade-up relative overflow-hidden group">
-                 <div className="absolute top-0 right-0 bg-[var(--gold)] text-[var(--dark-green)] px-6 md:px-8 py-2 font-black uppercase text-[8px] md:text-[9px] tracking-widest rounded-bl-3xl">Novo u ponudi</div>
-                 <div className="flex flex-col md:flex-row gap-8 md:gap-10 items-center">
-                    <div className="flex-1 space-y-4 md:space-y-6 text-left">
-                       <h3 className="font-display text-2xl md:text-3xl text-[var(--dark-green)]">Zipline Avantura</h3>
-                       <p className="text-gray-500 text-xs md:text-sm leading-relaxed font-medium">Doživite nezaboravno uzbuđenje na našem novom <strong>zipline-u</strong>! Bezbedna i zabavna aktivnost koja će upotpuniti svaki rođendan ili proslavu u prirodi.</p>
-                    </div>
-                    
-                    {/* VIDEO UMESTO SLIKE */}
-                    <div className="w-full md:w-[200px] lg:w-[240px] aspect-square rounded-[30px] md:rounded-[40px] overflow-hidden shadow-2xl transition-transform hover:scale-105 duration-500 border-4 border-white bg-black">
-                       <video 
-                          src={getImgPath("slike/galerija/zipline.mp4")} 
-                          className="w-full h-full object-cover"
-                          autoPlay 
-                          muted 
-                          loop 
-                          playsInline
-                       />
-                    </div>
-                 </div>
-              </div>
-           <div className="flex-1 relative w-full">
-              <div className="w-full h-[400px] md:h-[650px] rounded-[60px] md:rounded-[120px] overflow-hidden shadow-2xl z-10 lg:rotate-[2deg] border-[8px] md:border-[12px] border-white">
-                 <img src={getImgPath("slike/galerija/organizovano slavlje po zelji.jpg")} className="w-full h-full object-cover" alt="Garden" />
-              </div>
-              <div className="absolute -bottom-8 -left-8 md:-bottom-16 md:-left-16 w-40 md:w-80 h-40 md:h-80 bg-[var(--gold)]/30 rounded-full blur-[60px] md:blur-[120px] z-0"></div>
-           </div>
-        </div>
-      </section>
+   {/* 2. O NAMA / SAZNAJTE VIŠE */}
+  <section id="onama" className="py-24 px-6 md:px-12 bg-white overflow-hidden">
+    <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16 md:gap-24">
+       
+       {/* LEVA STRANA: Naslov, tekst i OBA obaveštenja (Kvad + Zipline) */}
+       <div className="flex-1 space-y-10 md:space-y-12">
+          <h2 className="font-display text-5xl md:text-7xl text-[var(--dark-green)] leading-tight text-center lg:text-left">
+            Vrt Iz Snova <br/> 
+            <span className="text-[var(--gold)] italic tracking-[3px] md:tracking-[4px]">U Srcu Ravnice</span>
+          </h2>
+          <div className="w-20 md:w-24 h-px bg-[var(--gold)] mx-auto lg:mx-0"></div>
+          <p className="text-gray-600 leading-[1.8] md:leading-[2.2] tracking-[1px] md:tracking-[2px] text-base md:text-lg text-center lg:text-left">
+            Indođija Luxury Event Garden je unikatno mesto za vaše najbitnije proslave. Spoj netaknute prirode i vrhunskog luksuza pruža nezaboravno iskustvo vama i vašim gostima.
+          </p>
+          
+          <div className="text-center lg:text-left">
+            <button onClick={() => setIsAboutDetailsOpen(true)} className="px-10 py-4 md:px-14 md:py-5 border-2 border-[var(--gold)] text-[var(--gold)] uppercase font-black tracking-[4px] md:tracking-[5px] text-[10px] md:text-[12px] hover:bg-[var(--gold)] hover:text-white transition-all rounded-[4px]">Saznajte Više</button>
+          </div>
+          
+          {/* KONTEJNER ZA KARTICE (Kvad i Zipline jedan ispod drugog unutar leve strane) */}
+          <div className="space-y-8">
+             {/* KARTICA ZA KVAD */}
+             <div className="mt-16 p-8 md:p-10 bg-white rounded-[40px] md:rounded-[50px] shadow-xl border border-gray-100 animate-fade-up relative overflow-hidden group">
+                <div className="absolute top-0 right-0 bg-[var(--gold)] text-[var(--dark-green)] px-6 md:px-8 py-2 font-black uppercase text-[8px] md:text-[9px] tracking-widest rounded-bl-3xl">Novo u ponudi</div>
+                <div className="flex flex-col md:flex-row gap-8 md:gap-10 items-center">
+                   <div className="flex-1 space-y-4 md:space-y-6 text-left">
+                      <h3 className="font-display text-2xl md:text-3xl text-[var(--dark-green)]">Adrenalinska Zabava</h3>
+                      <p className="text-gray-500 text-xs md:text-sm leading-relaxed font-medium">Od sada u Indođiji rezervisati <strong>vožnju kvadom</strong>! Priuštite mališanima nezaboravnu avanturu u bezbednom okruženju uz stručan nadzor.</p>
+                   </div>
+                   <div className="w-full md:w-[200px] lg:w-[240px] aspect-square rounded-[30px] md:rounded-[40px] overflow-hidden shadow-2xl transition-transform hover:scale-105 duration-500 border-4 border-white">
+                      <img src={getImgPath("slike/galerija/iznajmljivanje kvada.jpg")} alt="Deciji Kvad" className="w-full h-full object-cover" />
+                   </div>
+                </div>
+             </div>
+
+             {/* KARTICA ZA ZIPLINE (Unutar leve strane, ispod kvada) */}
+             <div className="p-8 md:p-10 bg-white rounded-[40px] md:rounded-[50px] shadow-xl border border-gray-100 animate-fade-up relative overflow-hidden group">
+                <div className="absolute top-0 right-0 bg-[var(--gold)] text-[var(--dark-green)] px-6 md:px-8 py-2 font-black uppercase text-[8px] md:text-[9px] tracking-widest rounded-bl-3xl">Novo u ponudi</div>
+                <div className="flex flex-col md:flex-row gap-8 md:gap-10 items-center">
+                   <div className="flex-1 space-y-4 md:space-y-6 text-left">
+                      <h3 className="font-display text-2xl md:text-3xl text-[var(--dark-green)]">Zipline Avantura</h3>
+                      <p className="text-gray-500 text-xs md:text-sm leading-relaxed font-medium">Doživite nezaboravno uzbuđenje na našem novom <strong>zipline-u</strong>! Bezbedna i zabavna aktivnost koja će upotpuniti svaku proslavu.</p>
+                   </div>
+                   <div className="w-full md:w-[200px] lg:w-[240px] aspect-square rounded-[30px] md:rounded-[40px] overflow-hidden shadow-2xl transition-transform hover:scale-105 duration-500 border-4 border-white bg-black">
+                      <video src={getImgPath("slike/galerija/zipline.mp4")} className="w-full h-full object-cover" autoPlay muted loop playsInline />
+                   </div>
+                </div>
+             </div>
+          </div>
+       </div>
+
+       {/* DESNA STRANA: Velika slika (sada će ponovo stajati pored) */}
+       <div className="flex-1 relative w-full">
+          <div className="w-full h-[400px] md:h-[650px] rounded-[60px] md:rounded-[120px] overflow-hidden shadow-2xl z-10 lg:rotate-[2deg] border-[8px] md:border-[12px] border-white">
+             <img src={getImgPath("slike/galerija/organizovano slavlje po zelji.jpg")} className="w-full h-full object-cover" alt="Garden" />
+          </div>
+          <div className="absolute -bottom-8 -left-8 md:-bottom-16 md:-left-16 w-40 md:w-80 h-40 md:h-80 bg-[var(--gold)]/30 rounded-full blur-[60px] md:blur-[120px] z-0"></div>
+       </div>
+
+    </div>
+  </section>
 
       {/* 3. PONUDE / REZERVACIJA */}
       <section id="ponude" className="py-24 px-4 md:px-12 bg-[var(--ivory)]">
