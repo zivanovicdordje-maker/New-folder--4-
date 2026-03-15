@@ -562,6 +562,28 @@ const extrasTotal =
                  </div>
               </div>
            </div>
+          {/* KARTICA ZA ZIPLINE SA VIDEOM */}
+              <div className="mt-8 p-8 md:p-10 bg-white rounded-[40px] md:rounded-[50px] shadow-xl border border-gray-100 animate-fade-up relative overflow-hidden group">
+                 <div className="absolute top-0 right-0 bg-[var(--gold)] text-[var(--dark-green)] px-6 md:px-8 py-2 font-black uppercase text-[8px] md:text-[9px] tracking-widest rounded-bl-3xl">Novo u ponudi</div>
+                 <div className="flex flex-col md:flex-row gap-8 md:gap-10 items-center">
+                    <div className="flex-1 space-y-4 md:space-y-6 text-left">
+                       <h3 className="font-display text-2xl md:text-3xl text-[var(--dark-green)]">Zipline Avantura</h3>
+                       <p className="text-gray-500 text-xs md:text-sm leading-relaxed font-medium">Doživite nezaboravno uzbuđenje na našem novom <strong>zipline-u</strong>! Bezbedna i zabavna aktivnost koja će upotpuniti svaki rođendan ili proslavu u prirodi.</p>
+                    </div>
+                    
+                    {/* VIDEO UMESTO SLIKE */}
+                    <div className="w-full md:w-[200px] lg:w-[240px] aspect-square rounded-[30px] md:rounded-[40px] overflow-hidden shadow-2xl transition-transform hover:scale-105 duration-500 border-4 border-white bg-black">
+                       <video 
+                          src={getImgPath("slike/galerija/zipline.mp4")} 
+                          className="w-full h-full object-cover"
+                          autoPlay 
+                          muted 
+                          loop 
+                          playsInline
+                       />
+                    </div>
+                 </div>
+              </div>
            <div className="flex-1 relative w-full">
               <div className="w-full h-[400px] md:h-[650px] rounded-[60px] md:rounded-[120px] overflow-hidden shadow-2xl z-10 lg:rotate-[2deg] border-[8px] md:border-[12px] border-white">
                  <img src={getImgPath("slike/galerija/organizovano slavlje po zelji.jpg")} className="w-full h-full object-cover" alt="Garden" />
